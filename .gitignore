@@ -1,10 +1,10 @@
 
 # VS Build results
-WerewolfBackend/[Dd]ebug/
-WerewolfBackend/[Rr]elease/
-WerewolfBackend/[Bb]in/
-WerewolfBackend/[Oo]bj/
-WerewolfBackend/[Ll]og/
+WerewolfBackend/WerewolfBackend/[Dd]ebug/
+WerewolfBackend/WerewolfBackend/[Rr]elease/
+WerewolfBackend/WerewolfBackend/[Bb]in/
+WerewolfBackend/WerewolfBackend/[Oo]bj/
+WerewolfBackend/WerewolfBackend/[Ll]og/
 
 # VS cache
 WerewolfBackend/.vs/
