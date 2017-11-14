@@ -1,0 +1,3 @@
+<view>
+  <input type="number" maxlength="6" focus="true" placeholder="请输入房间号" bindinput="inputRoom" />
+</view>

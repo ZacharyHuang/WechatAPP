@@ -1,0 +1,34 @@
+/* pages/game/game.wxss */
+image {
+  max-height: 100%;
+  max-width: 100%;
+}
+.scroll-section {
+  height: 80%;
+  padding-top: 10%;
+  padding-bottom: 10%;
+}
+.image-view {
+  height: 24vw;
+  width: 24vw;
+}
+.name-view {
+  height: 6vw;
+  width: 24vw;
+}
+.name-text {
+  font-size: small;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.seat-lg {
+  width: 30vw;
+  height: 30vw;
+  margin: 0 1vw;
+}
+.seat-sm {
+  width: 24vw;
+  height: 30vw;
+  margin: 0;
+}

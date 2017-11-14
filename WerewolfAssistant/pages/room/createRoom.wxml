@@ -1,0 +1,57 @@
+<!--pages/room/createRoom.wxml-->
+<view class="center" style="margin:10px">人数：{{playerNumber}}</view>
+<view class="row center">
+  <view style="margin:10px">神：{{godNumber}}</view>
+  <view style="margin:10px">民：{{villageNumber}}</view>
+  <view style="margin:10px">狼：{{allWerewolfNumber}}</view>
+</view>
+<scroll-view scroll-y="true" >
+  <view class="row godBlock">
+    <view class="center" style="width:20%">神</view>
+    <view style="width:80%">
+      <view class="row center">
+        <view class="characterView center {{prophet>0?'selected':''}}" bindtap="tapProphet">预言家</view>
+        <view class="characterView center {{witch>0?'selected':''}}" bindtap="tapWitch">女巫</view>
+        <view class="characterView center {{hunter>0?'selected':''}}" bindtap="tapHunter">猎人</view>
+      </view>
+      <view class="row center">
+        <view class="characterView center {{guard>0?'selected':''}}" bindtap="tapGuard">守卫</view>
+        <view class="characterView center {{idiot>0?'selected':''}}" bindtap="tapIdiot">白痴</view>
+        <view class="characterView center {{cupid>0?'selected':''}}" bindtap="tapCupid">丘比特</view>
+      </view>
+    </view>
+  </view>
+  <view class="row villageBlock">
+    <view class="center" style="width:20%">民</view>
+    <view style="width:80%">
+      <view class="row">
+        <button bindtap="decreaseVillage">-</button>
+        <view class="center">{{villageNumber}}个村民</view>
+        <button bindtap="increaseVillage">+</button>
+      </view>
+    </view>
+  </view>
+  <view class="row werewolfBlock">
+    <view class="center" style="width:20%">狼</view>
+    <view style="width:80%">
+      <view class="row center">
+        <view class="characterView center {{demon>0?'selected':''}}" bindtap="tapDemon">恶魔</view>
+        <view class="characterView center {{whiteWerewolf>0?'selected':''}}" bindtap="tapWhiteWerewolf">白狼王</view>
+      </view>
+      <view class="row">
+        <button bindtap="decreaseWerewolf">-</button>
+        <view class="center">{{werewolfNumber}}只狼</view>
+        <button bindtap="increaseWerewolf">+</button>
+      </view>
+    </view>
+  </view>
+  <view class="row otherBlock">
+    <view class="center" style="width:20%">其他</view>
+    <view style="width:80%">
+      <view class="row center">
+        <view class="characterView center {{thief>0?'selected':''}}" bindtap="tapThief">盗贼</view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+<view class="at-bottom" style="width:100%;"><button bindtap="submit">确定</button></view>
