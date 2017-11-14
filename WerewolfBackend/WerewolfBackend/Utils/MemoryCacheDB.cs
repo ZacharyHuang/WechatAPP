@@ -47,12 +47,18 @@ namespace WerewolfBackend.Utils
             return cache.Add(seatKey, player, policy);
         }
 
+        public static Player GetPlayer(string roomId, int seatNumber)
+        {
+            string seatKey = roomId + "_" + seatNumber.ToString();
+            return cache[seatKey] as Player;
+        }
+
         public static Player GetPlayer(string roomId, string userId)
         {
             for (int i = 0; i < 20; ++i)
             {
-                string sk = roomId + "_" + i.ToString();
-                var player = cache[sk] as Player;
+                string seatKey = roomId + "_" + i.ToString();
+                var player = cache[seatKey] as Player;
                 if (player != null && player.UserId == userId)
                 {
                     return player;
@@ -84,7 +90,7 @@ namespace WerewolfBackend.Utils
             return false;
         }
 
-        public static void EmptySeat(string roomId, int seatNumber)
+        public static void RemovePlayer(string roomId, int seatNumber)
         {
             string seatKey = roomId + "_" + seatNumber.ToString();
             cache.Remove(seatKey);

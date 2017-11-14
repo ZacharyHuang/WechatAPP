@@ -7,7 +7,7 @@ namespace WerewolfBackend.Models
 {
     public enum Character
     {
-        None,
+        None = 0,
         Village,
         Prophet,
         Witch,

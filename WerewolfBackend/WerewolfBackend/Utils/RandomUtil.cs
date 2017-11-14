@@ -32,7 +32,7 @@ namespace WerewolfBackend.Utils
         public static int GenRandomInt(int maxValue)
         {
             Random rand = new Random((int)DateTime.Now.Ticks);
-            return rand.Next(maxValue + 1);
+            return rand.Next(maxValue);
         }
     }
 }

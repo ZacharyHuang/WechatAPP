@@ -88,7 +88,7 @@ namespace WerewolfBackend.Controllers
             {
                 if (p != null)
                 {
-                    RoomDB.EmptySeat(roomId, p.SeatNumber);
+                    RoomDB.RemovePlayer(roomId, p.SeatNumber);
                 }
                 return Json("Success");
             }
