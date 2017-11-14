@@ -34,6 +34,8 @@ App({
     })
   },
   globalData: {
-    userInfo: null
+    userInfo: null,
+    backendHost: "http://localhost:18761/api",
+    debug: null
   }
 })

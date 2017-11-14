@@ -7,6 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    needSync: false,
     emptySeatAvatar: "../pics/emptySeat.png",
     roomId: "",
     userName: "",
@@ -16,7 +17,7 @@ Page({
     isReady: false,
     players: [],
     character: "",
-    iter: [],
+    iter: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
     config: null,
     gameStatus: null
   },
@@ -25,77 +26,160 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.setData({ roomId: options.roomId })
+    var roomId = options.roomId
     var userName = app.globalData.userInfo.nickName
     var userAvatar = app.globalData.userInfo.avatarUrl
+    app.globalData.debug = this
     this.setData({
+      roomId: roomId,
       userName: userName,
       userAvatar: userAvatar
     })
-    this.setData({ characters: ["Village", "Prophet", "Village", "Werewolf", "Werewolf", "Witch", "Village", "Hunter", "Werewolf"]})
     
-    var config = {
-      playerNumber: 16,
-      characterNumber: 16,
-      godNumber: 4,
-      villageNumber: 4,
-      werewolfNumber: 4,
-      hasProphet: true,
-      hasWitch: true,
-      hasHunter: true,
-      hasGuard: true,
-      hasIdiot: false,
-      hasCupid: false,
-      hasElder: false,
-      hasDemon: false,
-      hasWhiteWerewolf: false,
-      hasThief: false
-    }
-    this.setData({ config: config })
+    this.updateGame()
+    this.updatePlayers()
 
-    var iter = []
-    for (var i=0;i<this.data.config.playerNumber;++i) {
-      iter.push(i)
-    }
-    this.setData({ iter:iter })
+
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-  
+
+  },
+
+  onShow: function () {
+    this.setData({ needSync: true })
+    this.sync()
+  },
+
+  onHide: function () {
+    this.setData({ needSync: false })
+  },
+
+  onUnload: function () {
+    this.setData({ needSync: false })
+  },
+
+  syncPlayer: function () {
+    // if (this.data.needSync) {
+    //   this.updatePlayers()
+    //   setTimeout(this.sync, 250)
+    // }
+  },
+
+  syncGame: function () {
+    
+  },
+
+  updatePlayers: function () {
+    var that = this
+    var url = app.globalData.backendHost + "/Room/GetPlayers?roomId=" + this.data.roomId
+    wx.request({
+      url: url,
+      success: function (res) {
+        console.log(res)
+        if (res.statusCode == 200) {
+          var players = JSON.parse(res.data)
+          that.setData({ players: players })
+        }
+      },
+    })
+  },
+
+  updateGame: function () {
+    var that = this
+    var url = app.globalData.backendHost + "/Game/GetGame?roomId=" + this.data.roomId
+    wx.request({
+      url: url,
+      success: function (res) {
+        console.log(res)
+        if (res.statusCode == 200) {
+          var game = JSON.parse(res.data)
+          that.setData({ config: game.Config })
+        }
+      },
+    })
   },
 
   tapSeat: function (e) {
+    var that = this
+    var url = ""
     var seatNumber = Number(e.currentTarget.dataset.seatnumber)
-    if (this.data.players[seatNumber] && this.data.players[seatNumber].name == this.data.userName) {
-      var players = this.data.Players
-      players[seatNumber] = null
-      this.setData({
-        players: players,
-        isHost: false
+
+    if (this.data.players[seatNumber] && this.data.players[seatNumber].UserName == this.data.userName) {
+      url = app.globalData.backendHost + "/Room/LeaveSeat?roomId=" + this.data.roomId + "&userId=" + this.data.userName
+      wx.request({
+        url: url,
+        success: function (res) {
+          if (res.statusCode == 200) {
+            that.updatePlayers()
+            that.setData({
+              isHost: false,
+              seatNumber: -1
+            })
+          }
+          else {
+            wx.showModal({
+              title: '离座失败',
+              content: res.data.Message,
+              showCancel: false
+            })
+          }
+        }
       })
     }
     else {
-      var players = this.data.players
-      for (var i=0; i<players.length; ++i) {
-        if (players[i] && players[i].name == this.data.userName) {
-          players[i] = null
+      url = app.globalData.backendHost + "/Room/TakeSeat?roomId=" + this.data.roomId + "&seatNumber=" + seatNumber + "&userId=" + this.data.userName + "&userName=" + this.data.userName + "&avatarUrl=" + this.data.userAvatar
+      wx.request({
+        url: url,
+        success: function (res) {
+          if (res.statusCode == 200) {
+            that.updatePlayers()
+            that.setData({
+              isHost: seatNumber == 0,
+              seatNumber: seatNumber
+            })
+          }
+          else {
+            wx.showModal({
+              title: '占座失败',
+              content: res.data.Message,
+              showCancel: false
+            })
+          }
         }
-      }
-      players[seatNumber] = {
-        name: this.data.userName,
-        avatar: this.data.userAvatar
-      }
-      this.setData({
-        players: players,
-        isHost: seatNumber == 0
-       })
+      })
+
     }
+    // if (this.data.players[seatNumber] && this.data.players[seatNumber].name == this.data.userName) {
+    //   var players = this.data.Players
+    //   players[seatNumber] = null
+    //   this.setData({
+    //     players: players,
+    //     isHost: false
+    //   })
+    // }
+    // else {
+    //   var players = this.data.players
+    //   for (var i=0; i<players.length; ++i) {
+    //     if (players[i] && players[i].name == this.data.userName) {
+    //       players[i] = null
+    //     }
+    //   }
+    //   players[seatNumber] = {
+    //     name: this.data.userName,
+    //     avatar: this.data.userAvatar
+    //   }
+    //   this.setData({
+    //     players: players,
+    //     isHost: seatNumber == 0
+    //    })
+    // }
   },
 
   start: function () {
-    this.setData({gameStatus: "dayTime"})
+    this.setData({ gameStatus: "dayTime" })
   }
 })

@@ -1,4 +1,6 @@
 // pages/room/createRoom.js
+const app = getApp()
+
 Page({
 
   /**
@@ -123,14 +125,31 @@ Page({
     var werewolves = (this.data.demon > 0 ? "恶魔，" : "") + (this.data.whiteWerewolf > 0 ? "白狼王，" : "") + this.data.werewolfNumber + "只狼，"
     var villages = "" + this.data.villageNumber + "个村民"
     var content = "配置：" + gods + werewolves + villages
-    var createGameUrl = "http://mywerewolfassistant.chinacloudapp.cn/Home/CreateGame?villageNumber=" + this.data.villageNumber + "&werewolfNumber=" + this.data.werewolfNumber + "&prophet=" + this.data.prophet + "&witch=" + this.data.witch + "&hunter=" + this.data.hunter + "&guard=" + this.data.guard + "&idiot=" + this.data.idiot + "&cupid=" + this.data.cupid + "&demon=" + this.data.demon
+    var createGameUrl = app.globalData.backendHost + "/Room/CreateRoom?villageNumber=" + this.data.villageNumber + "&werewolfNumber=" + this.data.werewolfNumber + "&prophet=" + this.data.prophet + "&witch=" + this.data.witch + "&hunter=" + this.data.hunter + "&guard=" + this.data.guard + "&idiot=" + this.data.idiot + "&cupid=" + this.data.cupid + "&demon=" + this.data.demon
         + "&whiteWerewolf=" + this.data.whiteWerewolf + "&thief=" + this.data.thief
     wx.showModal({
       title: "确认提交？",
       content: content,
       success: function (res) {
         if (res.confirm) {
-          console.log(createGameUrl)
+          wx.request({
+            url: createGameUrl,
+            success: function (res) {
+              if (res.statusCode == 200) {
+                wx.redirectTo({
+                  url: '../game/game?roomId=' + res.data
+                })
+              }
+              else{
+                console.log(res)
+                wx.showModal({
+                  title: '创建失败',
+                  content: res.data.Message,
+                  showCancel: false
+                })
+              }
+            }
+          })
         }
       }
     })
