@@ -10,14 +10,13 @@ namespace WerewolfBackend.Controllers
 {
     public class GameController : Controller
     {
-
         public ActionResult StartGame(string roomId)
         {
             // check game
             var game = GameDB.GetGame(roomId);
             if (game == null)
             {
-                return Json("Game not exist");
+                return Json("Game not exist", JsonRequestBehavior.AllowGet);
             }
 
             // check player ready
@@ -27,7 +26,7 @@ namespace WerewolfBackend.Controllers
                 var player = RoomDB.GetPlayer(roomId, i);
                 if (player == null || player.State != PlayerState.Ready)
                 {
-                    return Json("Some player are not ready");
+                    return Json("Some player are not ready", JsonRequestBehavior.AllowGet);
                 }
                 players.Add(player);
             }
@@ -42,7 +41,7 @@ namespace WerewolfBackend.Controllers
             game.InitGame();
             GameDB.SetGame(roomId, game);
 
-            return Json("Success");
+            return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult GetGame(string roomId)
@@ -50,10 +49,10 @@ namespace WerewolfBackend.Controllers
             var game = GameDB.GetGame(roomId);
             if (game == null)
             {
-                return Json("Game not exist");
+                return Json("Game not exist", JsonRequestBehavior.AllowGet);
             }
 
-            return Json(game);
+            return Json(game, JsonRequestBehavior.AllowGet);
         }
     }
 }

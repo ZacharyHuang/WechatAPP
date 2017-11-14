@@ -61,7 +61,7 @@ namespace WerewolfBackend.Controllers
             };
 
             GameDB.SetGame(roomId, game);
-            return Json("Success");
+            return Json(roomId, JsonRequestBehavior.AllowGet);
         }
         public ActionResult TakeSeat(string roomId, int seatNumber, string userId, string userName, string avatarUrl)
         {
@@ -70,7 +70,7 @@ namespace WerewolfBackend.Controllers
             var p = RoomDB.GetPlayer(roomId, userId);
             if (p != null && p.State == PlayerState.Ready)
             {
-                return Json("Player is ready");
+                return Json("Player is ready", JsonRequestBehavior.AllowGet);
             }
 
             string seatKey = roomId + "_" + seatNumber.ToString();
@@ -90,18 +90,18 @@ namespace WerewolfBackend.Controllers
                 {
                     RoomDB.RemovePlayer(roomId, p.SeatNumber);
                 }
-                return Json("Success");
+                return Json("Success", JsonRequestBehavior.AllowGet);
             }
             else
             {
-                return Json("Seat is token");
+                return Json("Seat is token", JsonRequestBehavior.AllowGet);
             }
         }
 
         public ActionResult LeaveSeat(string roomId, string userId)
         {
             RoomDB.RemovePlayer(roomId, userId);
-            return Json("Success");
+            return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Prepare(string roomId, string userId)
@@ -109,11 +109,11 @@ namespace WerewolfBackend.Controllers
             var player = RoomDB.GetPlayer(roomId, userId);
             if (player == null)
             {
-                return Json("Player has no seat");
+                return Json("Player has no seat", JsonRequestBehavior.AllowGet);
             }
             player.State = PlayerState.Ready;
             RoomDB.SetPlayer(roomId, player);
-            return Json("Success");
+            return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UnPrepare(string roomId, string userId)
@@ -121,11 +121,11 @@ namespace WerewolfBackend.Controllers
             var player = RoomDB.GetPlayer(roomId, userId);
             if (player == null)
             {
-                return Json("Player has no seat");
+                return Json("Player has no seat", JsonRequestBehavior.AllowGet);
             }
             player.State = PlayerState.Sit;
             RoomDB.SetPlayer(roomId, player);
-            return Json("Success");
+            return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
     }
