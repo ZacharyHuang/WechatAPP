@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -63,6 +64,26 @@ namespace WerewolfBackend.Controllers
             GameDB.SetGame(roomId, game);
             return Json(roomId, JsonRequestBehavior.AllowGet);
         }
+
+        public ActionResult GetPlayers(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null || game.Config == null)
+            {
+                return Json("Room not exist", JsonRequestBehavior.AllowGet);
+            }
+
+            int playerNumber = game.Config.PlayerNumber;
+            Player[] players = new Player[playerNumber];
+            for (int i = 0; i < playerNumber; ++i)
+            {
+                var player = RoomDB.GetPlayer(roomId, i);
+                players[i] = player;
+            }
+
+            return Json(JsonConvert.SerializeObject(players), JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult TakeSeat(string roomId, int seatNumber, string userId, string userName, string avatarUrl)
         {
 

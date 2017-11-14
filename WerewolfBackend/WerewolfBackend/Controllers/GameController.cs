@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,7 +17,7 @@ namespace WerewolfBackend.Controllers
             var game = GameDB.GetGame(roomId);
             if (game == null)
             {
-                return Json("Game not exist", JsonRequestBehavior.AllowGet);
+                return Content("Game not exist");
             }
 
             // check player ready
@@ -26,7 +27,7 @@ namespace WerewolfBackend.Controllers
                 var player = RoomDB.GetPlayer(roomId, i);
                 if (player == null || player.State != PlayerState.Ready)
                 {
-                    return Json("Some player are not ready", JsonRequestBehavior.AllowGet);
+                    return Content("Some player are not ready");
                 }
                 players.Add(player);
             }
@@ -41,7 +42,7 @@ namespace WerewolfBackend.Controllers
             game.InitGame();
             GameDB.SetGame(roomId, game);
 
-            return Json("Success", JsonRequestBehavior.AllowGet);
+            return Content("Success");
         }
 
         public ActionResult GetGame(string roomId)
@@ -49,10 +50,10 @@ namespace WerewolfBackend.Controllers
             var game = GameDB.GetGame(roomId);
             if (game == null)
             {
-                return Json("Game not exist", JsonRequestBehavior.AllowGet);
+                return Content("Game not exist");
             }
 
-            return Json(game, JsonRequestBehavior.AllowGet);
+            return Content(JsonConvert.SerializeObject(game));
         }
     }
 }

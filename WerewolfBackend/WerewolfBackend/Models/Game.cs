@@ -67,14 +67,14 @@ namespace WerewolfBackend.Models
             List<Character> characters = new List<Character>();
             for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Thief);
             for (int i = 0; i < Config.ProphetNumber; ++i) characters.Add(Character.Prophet);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Witch);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Hunter);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Guard);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Idiot);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Demon);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.WhiteWerewolf);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Village);
-            for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Werewolf);
+            for (int i = 0; i < Config.WitchNumber; ++i) characters.Add(Character.Witch);
+            for (int i = 0; i < Config.HunterNumber; ++i) characters.Add(Character.Hunter);
+            for (int i = 0; i < Config.GuardNumber; ++i) characters.Add(Character.Guard);
+            for (int i = 0; i < Config.IdiotNumber; ++i) characters.Add(Character.Idiot);
+            for (int i = 0; i < Config.DemonNumber; ++i) characters.Add(Character.Demon);
+            for (int i = 0; i < Config.WhiteWerewolfNumber; ++i) characters.Add(Character.WhiteWerewolf);
+            for (int i = 0; i < Config.VillageNumber; ++i) characters.Add(Character.Village);
+            for (int i = 0; i < Config.WerewolfNumber; ++i) characters.Add(Character.Werewolf);
 
             // choose thief candidates
             if (Config.ThiefNumber > 0)
@@ -131,5 +131,19 @@ namespace WerewolfBackend.Models
 
         public int Date { get; set; }
         public GameStage Stage { get; set; }
+        public List<GameTrace> Trace { get; set; }
+        public GameStatus()
+        {
+            Trace = new List<GameTrace>();
+        }
+    }
+    public class GameTrace
+    {
+        public int WerewolfKill;
+        public int WitchPoison;
+        public bool WitchHeal;
+        public int ProphetCheck;
+        public int GuardGuard;
+        public int DemonCheck;
     }
 }
