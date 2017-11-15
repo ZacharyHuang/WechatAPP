@@ -62,7 +62,7 @@ namespace WerewolfBackend.Models
             Status.CanDemonCheck = Config.DemonNumber > 0;
 
             // prepare all characters
-            if (Characters == null || Characters.Length != Config.PlayerNumber) { Characters = new Character[Config.PlayerNumber]; }
+            if (Characters == null || Characters.Length != Config.PlayerNumber + 1) { Characters = new Character[Config.PlayerNumber + 1]; }
             int characterNumber = Config.PlayerNumber + (Config.ThiefNumber > 0 ? 2 : 0);
             List<Character> characters = new List<Character>();
             for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Thief);
@@ -92,13 +92,151 @@ namespace WerewolfBackend.Models
             }
 
             // choose character for each seat
-            for (int i = 0; i < Characters.Length; ++i)
+            Characters[0] = Character.None;
+            for (int i = 1; i <= Characters.Length; ++i)
             {
                 int rand = RandomUtil.GenRandomInt(characters.Count);
                 Characters[i] = characters[rand];
                 characters.RemoveAt(rand);
             }
+        }
 
+        public void NextStage()
+        {
+            if (Status.Stage == GameStage.DayTime)
+            {
+                Status.Stage =
+                    (Status.Date == 0 && Config.ThiefNumber > 0) ? GameStage.ThiefNight :
+                    (Status.Date == 0 && Config.CupidNumber > 0) ? GameStage.CupidNight :
+                    GameStage.WerewolfNight;
+            }
+            else if (Status.Stage == GameStage.ThiefNight)
+            {
+                Status.Stage =
+                    Config.CupidNumber > 0 ? GameStage.CupidNight :
+                    GameStage.WerewolfNight;
+            }
+            else if (Status.Stage == GameStage.CupidNight)
+            {
+                Status.Stage = GameStage.LoversNight;
+            }
+            else if (Status.Stage == GameStage.LoversNight)
+            {
+                Status.Stage = GameStage.WerewolfNight;
+            }
+            else if (Status.Stage == GameStage.WerewolfNight)
+            {
+                Status.Stage =
+                    Config.WitchNumber > 0 ? GameStage.WitchNight :
+                    Config.ProphetNumber > 0 ? GameStage.ProphetNight :
+                    Config.GuardNumber > 0 ? GameStage.GuardNight :
+                    Config.DemonNumber > 0 ? GameStage.DemonNight :
+                    GameStage.DayTime;
+            }
+            else if (Status.Stage == GameStage.WitchNight)
+            {
+                Status.Stage =
+                    Config.ProphetNumber > 0 ? GameStage.ProphetNight :
+                    Config.GuardNumber > 0 ? GameStage.GuardNight :
+                    Config.DemonNumber > 0 ? GameStage.DemonNight :
+                    GameStage.DayTime;
+            }
+            else if (Status.Stage == GameStage.ProphetNight)
+            {
+                Status.Stage =
+                    Config.GuardNumber > 0 ? GameStage.GuardNight :
+                    Config.DemonNumber > 0 ? GameStage.DemonNight :
+                    GameStage.DayTime;
+            }
+            else if (Status.Stage == GameStage.GuardNight)
+            {
+                Status.Stage =
+                    Config.DemonNumber > 0 ? GameStage.DemonNight :
+                    GameStage.DayTime;
+            }
+            else if (Status.Stage == GameStage.DemonNight)
+            {
+                Status.Stage = GameStage.DayTime;
+            }
+
+            // update status if day time comes
+            if (Status.Stage == GameStage.DayTime)
+            {
+                List<int> dead1 = new List<int>();
+                if (Status.Trace[Status.Date].WerewolfKill > 0)
+                {
+                    bool heal = Status.Trace[Status.Date].WitchHeal, guard = Status.Trace[Status.Date].GuardGuard == Status.Trace[Status.Date].WerewolfKill;
+                    // demon won't die in the night， no heal no guard or heal guard in a same time will die
+                    if (Characters[Status.Trace[Status.Date].WitchPoison] != Character.Demon && ((heal && guard) || !(heal || guard)))
+                    {
+                        dead1.Add(Status.Trace[Status.Date].WerewolfKill);
+                    }
+                }
+                if (Status.Trace[Status.Date].WitchPoison > 0)
+                {
+                    // demon won't die in the night
+                    if (Characters[Status.Trace[Status.Date].WitchPoison] != Character.Demon)
+                    {
+                        dead1.Add(Status.Trace[Status.Date].WitchPoison);
+                    }
+                    // hunter can't shoot if poisoned
+                    if (Characters[Status.Trace[Status.Date].WitchPoison] == Character.Hunter)
+                    {
+                        Status.CanHunterShoot = false;
+                    }
+                }
+                // check dead lovers and distinct dead
+                HashSet<int> dead2 = new HashSet<int>();
+                foreach (var dead in dead1)
+                {
+                    dead2.Add(dead);
+                    if (Lovers[0] == dead) dead2.Add(Lovers[1]);
+                    else if (Lovers[1] == dead) dead2.Add(Lovers[0]);
+                }
+                Status.Trace[Status.Date].Dead = dead2.ToList();
+                // check dead skill
+                foreach (var dead in dead2)
+                {
+                    if (Characters[dead] == Character.Prophet) Status.CanProphetCheck = false;
+                    else if (Characters[dead] == Character.Witch) Status.CanWitchHeal = Status.CanWitchPoison = false;
+                    else if (Characters[dead] == Character.Guard) Status.CanGuardGuard = false;
+                }
+                ++Status.Date;
+            }
+        }
+        public void WerewolfKill(int seatNumber)
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            Status.Trace[Status.Date].WerewolfKill = seatNumber;
+        }
+        public void WitchHeal()
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            Status.Trace[Status.Date].WitchHeal = true;
+        }
+        public void WitchPoison(int seatNumber)
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            Status.Trace[Status.Date].WitchPoison = seatNumber;
+        }
+        public Camp ProphetCheck(int seatNumber)
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            Status.Trace[Status.Date].ProphetCheck = seatNumber;
+            return CharacterUtil.CheckCamp(Characters[seatNumber]);
+        }
+        public bool GuardGuard(int seatNumber)
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Date > 0 && seatNumber == Status.Trace[Status.Date - 1].GuardGuard) return false;
+            Status.Trace[Status.Date].GuardGuard = seatNumber;
+            return true;
+        }
+        public Camp DemonCheck(int seatNumber)
+        {
+            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            Status.Trace[Status.Date].DemonCheck = seatNumber;
+            return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }
     }
     public class GameConfig
@@ -145,5 +283,7 @@ namespace WerewolfBackend.Models
         public int ProphetCheck;
         public int GuardGuard;
         public int DemonCheck;
+
+        public List<int> Dead;
     }
 }

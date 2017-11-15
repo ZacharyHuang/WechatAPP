@@ -7,9 +7,11 @@ Page({
    * 页面的初始数据
    */
   data: {
-    needSync: false,
+    active: false,
+    stage: "Prepare",
     emptySeatAvatar: "../pics/emptySeat.png",
     roomId: "",
+    userId: "",
     userName: "",
     userAvatar: "",
     isHost: false,
@@ -32,45 +34,42 @@ Page({
     app.globalData.debug = this
     this.setData({
       roomId: roomId,
+      userId: userName,
       userName: userName,
       userAvatar: userAvatar
     })
     
-    this.updateGame()
+    this.updateGameConfig()
     this.updatePlayers()
-
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
+    this.updateGameStage()
+    this.syncGameStage()
+    this.syncPlayer()
   },
 
   onShow: function () {
-    this.setData({ needSync: true })
-    this.sync()
+    this.setData({ active: true })
   },
 
   onHide: function () {
-    this.setData({ needSync: false })
+    this.setData({ active: false })
   },
 
   onUnload: function () {
-    this.setData({ needSync: false })
+    this.setData({ active: false })
   },
 
   syncPlayer: function () {
-    // if (this.data.needSync) {
-    //   this.updatePlayers()
-    //   setTimeout(this.sync, 250)
-    // }
+    if (this.data.active) {
+      this.updatePlayers()
+    }
+    setTimeout(this.syncPlayer, this.data.stage == "Prepare" ? 250 : 5000)
   },
 
-  syncGame: function () {
-    
+  syncGameStage: function () {
+    if (this.data.active) {
+      this.updateGameStage()
+    }
+    setTimeout(this.syncGameStage, 1000)
   },
 
   updatePlayers: function () {
@@ -88,16 +87,31 @@ Page({
     })
   },
 
-  updateGame: function () {
+  updateGameConfig: function () {
     var that = this
-    var url = app.globalData.backendHost + "/Game/GetGame?roomId=" + this.data.roomId
+    var url = app.globalData.backendHost + "/Game/GetGameConfig?roomId=" + this.data.roomId
     wx.request({
       url: url,
       success: function (res) {
         console.log(res)
         if (res.statusCode == 200) {
-          var game = JSON.parse(res.data)
-          that.setData({ config: game.Config })
+          var config = JSON.parse(res.data)
+          that.setData({ config: config })
+        }
+      },
+    })
+  },
+
+  updateGameStage: function () {
+    var that = this
+    var url = app.globalData.backendHost + "/Game/GetGameStage?roomId=" + this.data.roomId
+    wx.request({
+      url: url,
+      success: function (res) {
+        console.log(res)
+        if (res.statusCode == 200) {
+          var stage = res.data
+          that.setData({ stage: stage })
         }
       },
     })
@@ -108,13 +122,12 @@ Page({
     var url = ""
     var seatNumber = Number(e.currentTarget.dataset.seatnumber)
 
-    if (this.data.players[seatNumber] && this.data.players[seatNumber].UserName == this.data.userName) {
-      url = app.globalData.backendHost + "/Room/LeaveSeat?roomId=" + this.data.roomId + "&userId=" + this.data.userName
+    if (this.data.players[seatNumber] && this.data.players[seatNumber].UserId == this.data.userId) {
+      url = app.globalData.backendHost + "/Room/LeaveSeat?roomId=" + this.data.roomId + "&userId=" + this.data.userId
       wx.request({
         url: url,
         success: function (res) {
           if (res.statusCode == 200) {
-            that.updatePlayers()
             that.setData({
               isHost: false,
               seatNumber: -1
@@ -127,16 +140,22 @@ Page({
               showCancel: false
             })
           }
+        },
+        complete: function () {
+          that.updatePlayers()
         }
       })
+      // var players = this.data.players
+      // players[seatNumber] = null
+      // that.setData({ players: players })
+
     }
     else {
-      url = app.globalData.backendHost + "/Room/TakeSeat?roomId=" + this.data.roomId + "&seatNumber=" + seatNumber + "&userId=" + this.data.userName + "&userName=" + this.data.userName + "&avatarUrl=" + this.data.userAvatar
+      url = app.globalData.backendHost + "/Room/TakeSeat?roomId=" + this.data.roomId + "&seatNumber=" + seatNumber + "&userId=" + this.data.userId + "&userName=" + this.data.userName + "&avatarUrl=" + this.data.userAvatar
       wx.request({
         url: url,
         success: function (res) {
           if (res.statusCode == 200) {
-            that.updatePlayers()
             that.setData({
               isHost: seatNumber == 0,
               seatNumber: seatNumber
@@ -149,34 +168,24 @@ Page({
               showCancel: false
             })
           }
+        },
+        complete: function () {
+          that.updatePlayers()
         }
       })
-
+      // var players = this.data.players 
+      // for (var i=0; i<players.length; ++i) {
+      //   if (players[i] && players[i].UserId == this.data.userId) {
+      //     players[i] = null
+      //   }
+      // }
+      // players[seatNumber] = {
+      //   UserId: this.data.userId,
+      //   UserName: this.data.userName,
+      //   AvatarUrl: this.data.userAvatar
+      // }
+      // that.setData({ players: players })
     }
-    // if (this.data.players[seatNumber] && this.data.players[seatNumber].name == this.data.userName) {
-    //   var players = this.data.Players
-    //   players[seatNumber] = null
-    //   this.setData({
-    //     players: players,
-    //     isHost: false
-    //   })
-    // }
-    // else {
-    //   var players = this.data.players
-    //   for (var i=0; i<players.length; ++i) {
-    //     if (players[i] && players[i].name == this.data.userName) {
-    //       players[i] = null
-    //     }
-    //   }
-    //   players[seatNumber] = {
-    //     name: this.data.userName,
-    //     avatar: this.data.userAvatar
-    //   }
-    //   this.setData({
-    //     players: players,
-    //     isHost: seatNumber == 0
-    //    })
-    // }
   },
 
   start: function () {

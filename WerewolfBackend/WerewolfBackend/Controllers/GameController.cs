@@ -47,7 +47,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GetGame(string roomId)
+        public IHttpActionResult GetGameConfig(string roomId)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -55,7 +55,40 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Game not exist");
             }
 
-            return Ok(JsonConvert.SerializeObject(game));
+            return Ok(JsonConvert.SerializeObject(game.Config));
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetCharacter(string roomId, int seatNumber)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (game.Status.Stage == GameStage.Prepare)
+            {
+                return BadRequest("Game not start");
+            }
+
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
+            {
+                return BadRequest("Seat number is illegal");
+            }
+
+            return Ok(game.Characters[seatNumber].ToString());
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetGameStage(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+            return Ok(game.Status.Stage.ToString());
         }
     }
 }

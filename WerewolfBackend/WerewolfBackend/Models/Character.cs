@@ -20,4 +20,5 @@ namespace WerewolfBackend.Models
         WhiteWerewolf,
         Thief
     }
+    
 }

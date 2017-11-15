@@ -248,3 +248,9 @@ D:\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.WebHost.dll
 D:\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Net.Http.Formatting.xml
 D:\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.xml
 D:\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.WebHost.xml
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Net.Http.Formatting.dll
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.dll
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.WebHost.dll
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Net.Http.Formatting.xml
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.xml
+D:\git\WechatAPP\WerewolfBackend\WerewolfBackend\bin\System.Web.Http.WebHost.xml
