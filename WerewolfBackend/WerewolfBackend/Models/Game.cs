@@ -49,17 +49,17 @@ namespace WerewolfBackend.Models
             if (Config.CupidNumber > 0 && Lovers == null) Lovers = new int[2];
             else if (Config.CupidNumber <= 0) Lovers = null;
 
-            // date and stage
+            // status clear
             Status.Date = 0;
-            Status.Stage = GameStage.Prepare;
-
-            // character skills
-            Status.CanProphetCheck = Config.ProphetNumber > 0;
-            Status.CanWitchHeal = Config.WitchNumber > 0;
-            Status.CanWitchPoison = Config.WitchNumber > 0;
-            Status.CanHunterShoot = Config.HunterNumber > 0;
-            Status.CanGuardGuard = Config.GuardNumber > 0;
-            Status.CanDemonCheck = Config.DemonNumber > 0;
+            Status.Stage = GameStage.DayTime;
+            Status.CanProphetCheck = false;
+            Status.CanWitchHeal = false;
+            Status.CanWitchPoison = false;
+            Status.CanHunterShoot = false;
+            Status.CanGuardGuard = false;
+            Status.CanDemonCheck = false;
+            Status.CanThiefChoose = false;
+            Status.CanCupidMakeCouple = false;
 
             // prepare all characters
             if (Characters == null || Characters.Length != Config.PlayerNumber + 1) { Characters = new Character[Config.PlayerNumber + 1]; }
@@ -97,6 +97,31 @@ namespace WerewolfBackend.Models
             {
                 int rand = RandomUtil.GenRandomInt(characters.Count);
                 Characters[i] = characters[rand];
+                switch (Characters[i])
+                {
+                    case Character.Prophet:
+                        Status.CanProphetCheck = true;
+                        break;
+                    case Character.Witch:
+                        Status.CanWitchHeal = true;
+                        Status.CanWitchPoison = true;
+                        break;
+                    case Character.Hunter:
+                        Status.CanHunterShoot = true;
+                        break;
+                    case Character.Guard:
+                        Status.CanGuardGuard = true;
+                        break;
+                    case Character.Thief:
+                        Status.CanThiefChoose = true;
+                        break;
+                    case Character.Cupid:
+                        Status.CanCupidMakeCouple = true;
+                        break;
+                    case Character.Demon:
+                        Status.CanDemonCheck = true;
+                        break;
+                }
                 characters.RemoveAt(rand);
             }
         }
@@ -238,6 +263,39 @@ namespace WerewolfBackend.Models
             Status.Trace[Status.Date].DemonCheck = seatNumber;
             return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }
+
+        public void ThiefChoose(int choice)
+        {
+            Characters[ThiefSeatNumber] = ThiefCandidates[choice];
+            switch (Characters[ThiefSeatNumber])
+            {
+                case Character.Prophet:
+                    Status.CanProphetCheck = true;
+                    break;
+                case Character.Witch:
+                    Status.CanWitchHeal = true;
+                    Status.CanWitchPoison = true;
+                    break;
+                case Character.Hunter:
+                    Status.CanHunterShoot = true;
+                    break;
+                case Character.Guard:
+                    Status.CanGuardGuard = true;
+                    break;
+                case Character.Cupid:
+                    Status.CanCupidMakeCouple = true;
+                    break;
+                case Character.Demon:
+                    Status.CanDemonCheck = true;
+                    break;
+            }
+        }
+
+        public void CupidMakeCouple(int lover1, int lover2)
+        {
+            Lovers[0] = lover1;
+            Lovers[1] = lover2;
+        }
     }
     public class GameConfig
     {
@@ -256,6 +314,10 @@ namespace WerewolfBackend.Models
         public int PlayerNumber { get; set; }
         public int VillageNumber { get; set; }
         public int WerewolfNumber { get; set; }
+
+        public bool WitchHealSelf { get; set; }
+        public bool WitchTwoSkillInOneNight { get; set; }
+        public bool HealAndGuardIsDead { get; set; }
     }
     public class GameStatus
     {
@@ -265,6 +327,8 @@ namespace WerewolfBackend.Models
         public bool CanHunterShoot { get; set; }
         public bool CanGuardGuard { get; set; }
         public bool CanDemonCheck { get; set; }
+        public bool CanThiefChoose { get; set; }
+        public bool CanCupidMakeCouple { get; set; }
 
 
         public int Date { get; set; }
