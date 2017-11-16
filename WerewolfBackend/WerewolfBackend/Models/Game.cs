@@ -51,7 +51,7 @@ namespace WerewolfBackend.Models
 
             // status clear
             Status.Date = 0;
-            Status.Stage = GameStage.DayTime;
+            Status.Stage = GameStage.Prepare;
             Status.CanProphetCheck = false;
             Status.CanWitchHeal = false;
             Status.CanWitchPoison = false;
@@ -93,7 +93,7 @@ namespace WerewolfBackend.Models
 
             // choose character for each seat
             Characters[0] = Character.None;
-            for (int i = 1; i <= Characters.Length; ++i)
+            for (int i = 1; i <= Config.PlayerNumber; ++i)
             {
                 int rand = RandomUtil.GenRandomInt(characters.Count);
                 Characters[i] = characters[rand];
@@ -128,7 +128,7 @@ namespace WerewolfBackend.Models
 
         public void NextStage()
         {
-            if (Status.Stage == GameStage.DayTime)
+            if (Status.Stage == GameStage.DayTime || Status.Stage == GameStage.Prepare)
             {
                 Status.Stage =
                     (Status.Date == 0 && Config.ThiefNumber > 0) ? GameStage.ThiefNight :
@@ -315,7 +315,10 @@ namespace WerewolfBackend.Models
         public int VillageNumber { get; set; }
         public int WerewolfNumber { get; set; }
 
-        public bool WitchHealSelf { get; set; }
+        /// <summary>
+        /// 0: can't, 1: only first night, 2: always can
+        /// </summary>
+        public int WitchHealSelf { get; set; }
         public bool WitchTwoSkillInOneNight { get; set; }
         public bool HealAndGuardIsDead { get; set; }
     }

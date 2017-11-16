@@ -12,66 +12,6 @@ namespace WerewolfBackend.Controllers
     public class RoomController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult CreateRoom(
-            int villageNumber,
-            int werewolfNumber,
-            int prophet = 0,
-            int witch = 0,
-            int hunter = 0,
-            int guard = 0,
-            int idiot = 0,
-            int cupid = 0,
-            int demon = 0,
-            int whiteWerewolf = 0,
-            int thief = 0
-            )
-        {
-            int prophetNumber = prophet > 0 ? 1 : 0,
-                witchNumber = witch > 0 ? 1 : 0,
-                hunterNumber = hunter > 0 ? 1 : 0,
-                guardNumber = guard > 0 ? 1 : 0,
-                idiotNumber = idiot > 0 ? 1 : 0,
-                cupidNumber = cupid > 0 ? 1 : 0,
-                demonNumber = demon > 0 ? 1 : 0,
-                whiteWerewolfNumber = whiteWerewolf > 0 ? 1 : 0,
-                thiefNumber = thief > 0 ? 1 : 0;
-
-            int playerNumber = villageNumber + werewolfNumber + prophetNumber + witchNumber + +hunterNumber + guardNumber + idiotNumber + cupidNumber + demonNumber + whiteWerewolfNumber - thiefNumber;
-
-            if (playerNumber <= 3)
-            {
-                return BadRequest("Player number is not enough");
-            }
-
-            GameConfig config = new GameConfig
-            {
-                VillageNumber = villageNumber,
-                WerewolfNumber = werewolfNumber,
-                PlayerNumber = playerNumber,
-                ProphetNumber = prophetNumber,
-                WitchNumber = witchNumber,
-                HunterNumber = hunterNumber,
-                GuardNumber = guardNumber,
-                IdiotNumber = idiotNumber,
-                CupidNumber = cupidNumber,
-                DemonNumber = demonNumber,
-                WhiteWerewolfNumber = whiteWerewolfNumber,
-                ThiefNumber = thiefNumber
-            };
-
-            string roomId = GameDB.NewGame();
-
-            Game game = new Game()
-            {
-                RoomId = roomId,
-                Config = config
-            };
-
-            GameDB.SetGame(roomId, game);
-            return Ok(roomId);
-        }
-
-        [HttpGet]
         public IHttpActionResult GetPlayers(string roomId)
         {
             var game = GameDB.GetGame(roomId);
@@ -81,8 +21,8 @@ namespace WerewolfBackend.Controllers
             }
 
             int playerNumber = game.Config.PlayerNumber;
-            Player[] players = new Player[playerNumber];
-            for (int i = 0; i < playerNumber; ++i)
+            Player[] players = new Player[playerNumber + 1];
+            for (int i = 1; i <= playerNumber; ++i)
             {
                 var player = RoomDB.GetPlayer(roomId, i);
                 players[i] = player;

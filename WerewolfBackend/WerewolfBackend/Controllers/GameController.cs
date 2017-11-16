@@ -12,40 +12,69 @@ namespace WerewolfBackend.Controllers
     public class GameController : ApiController
     {
         [HttpGet]
-        public IHttpActionResult StartGame(string roomId)
+        public IHttpActionResult CreateGame(
+            int villageNumber,
+            int werewolfNumber,
+            int prophet = 0,
+            int witch = 0,
+            int hunter = 0,
+            int guard = 0,
+            int idiot = 0,
+            int cupid = 0,
+            int demon = 0,
+            int whiteWerewolf = 0,
+            int thief = 0,
+            int witchHealSelf = 1,
+            bool witchTwoSkillInOneNight = false,
+            bool healAndGuardIsDead = true
+            )
         {
-            // check game
-            var game = GameDB.GetGame(roomId);
-            if (game == null)
+            int prophetNumber = prophet > 0 ? 1 : 0,
+                witchNumber = witch > 0 ? 1 : 0,
+                hunterNumber = hunter > 0 ? 1 : 0,
+                guardNumber = guard > 0 ? 1 : 0,
+                idiotNumber = idiot > 0 ? 1 : 0,
+                cupidNumber = cupid > 0 ? 1 : 0,
+                demonNumber = demon > 0 ? 1 : 0,
+                whiteWerewolfNumber = whiteWerewolf > 0 ? 1 : 0,
+                thiefNumber = thief > 0 ? 1 : 0;
+
+            int playerNumber = villageNumber + werewolfNumber + prophetNumber + witchNumber + +hunterNumber + guardNumber + idiotNumber + cupidNumber + demonNumber + whiteWerewolfNumber - thiefNumber;
+
+            if (playerNumber <= 3)
             {
-                return BadRequest("Game not exist");
+                return BadRequest("Player number is not enough");
             }
 
-            // check player ready
-            List<Player> players = new List<Player>();
-            for (int i = 0; i < game.Config.PlayerNumber; ++i)
+            GameConfig config = new GameConfig
             {
-                var player = RoomDB.GetPlayer(roomId, i);
-                if (player == null || player.State != PlayerState.Ready)
-                {
-                    return BadRequest("Some players are not ready");
-                }
-                players.Add(player);
-            }
+                VillageNumber = villageNumber,
+                WerewolfNumber = werewolfNumber,
+                PlayerNumber = playerNumber,
+                ProphetNumber = prophetNumber,
+                WitchNumber = witchNumber,
+                HunterNumber = hunterNumber,
+                GuardNumber = guardNumber,
+                IdiotNumber = idiotNumber,
+                CupidNumber = cupidNumber,
+                DemonNumber = demonNumber,
+                WhiteWerewolfNumber = whiteWerewolfNumber,
+                ThiefNumber = thiefNumber,
+                WitchHealSelf = witchHealSelf,
+                WitchTwoSkillInOneNight = witchTwoSkillInOneNight,
+                HealAndGuardIsDead = healAndGuardIsDead
+            };
 
-            // set players
-            foreach (var player in players)
-            {
-                player.State = PlayerState.Playing;
-                RoomDB.SetPlayer(roomId, player);
-            }
-            // init and set game
+            string roomId = GameDB.NewGame();
+
+            Game game = new Game();
+            game.RoomId = roomId;
+            game.Config = config;
             game.InitGame();
+
             GameDB.SetGame(roomId, game);
-
-            return Ok();
+            return Ok(roomId);
         }
-
         [HttpGet]
         public IHttpActionResult GetGameConfig(string roomId)
         {
@@ -65,11 +94,6 @@ namespace WerewolfBackend.Controllers
             if (game == null)
             {
                 return BadRequest("Game not exist");
-            }
-
-            if (game.Status.Stage == GameStage.Prepare)
-            {
-                return BadRequest("Game not start");
             }
 
             if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
@@ -92,7 +116,55 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult ThiefSkill(string roomId, int sourceSeatNumber, int choice)
+        public IHttpActionResult NightFall(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (game.Status.Stage != GameStage.Prepare && game.Status.Stage != GameStage.DayTime)
+            {
+                return BadRequest("Not now");
+            }
+
+            int playerNumber = game.Config.PlayerNumber;
+            for (int i = 1; i <= playerNumber; ++i)
+            {
+                var player = RoomDB.GetPlayer(roomId, i);
+                if (player.State != PlayerState.Ready)
+                {
+                    return BadRequest("Player " + player.SeatNumber + " not ready");
+                }
+            }
+
+            game.NextStage();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetNightInfo(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (game.Status.Stage != GameStage.DayTime || game.Status.Date < 1)
+            {
+                return BadRequest("Not now");
+            }
+
+            var dead = game.Status.Trace[game.Status.Date - 1].Dead;
+
+            return Ok(dead);
+        }
+
+        [HttpGet]
+        public IHttpActionResult ThiefSkill(string roomId, int sourceSeatNumber, bool useSkill, int choice)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -120,19 +192,19 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You are not the thief");
             }
 
-            if (choice < 0 || choice > 1)
+            if (useSkill && (choice < 0 || choice > 1))
             {
                 return BadRequest("No this choice");
             }
 
-            game.ThiefChoose(choice);
+            if (useSkill) game.ThiefChoose(choice);
             game.NextStage();
             GameDB.SetGame(roomId, game);
 
             return Ok();
         }
         [HttpGet]
-        public IHttpActionResult CupidSkill(string roomId, int sourceSeatNumber, int target1, int target2)
+        public IHttpActionResult CupidSkill(string roomId, int sourceSeatNumber, bool useSkill, int target1, int target2)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -160,12 +232,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You are not the cupid");
             }
 
-            if (target1 <= 0 || target2 <= 0 || target1 > game.Config.PlayerNumber || target2 > game.Config.PlayerNumber || target1 == target2)
+            if (useSkill && (target1 <= 0 || target2 <= 0 || target1 > game.Config.PlayerNumber || target2 > game.Config.PlayerNumber || target1 == target2))
             {
                 return BadRequest("Lovers illegal");
             }
 
-            game.CupidMakeCouple(target1, target2);
+            if (useSkill) game.CupidMakeCouple(target1, target2);
             game.NextStage();
             GameDB.SetGame(roomId, game);
 
@@ -173,7 +245,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult WerewolfSkill(string roomId, int sourceSeatNumber, bool kill, int target)
+        public IHttpActionResult WerewolfSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -196,12 +268,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You can not kill people");
             }
 
-            if (kill && (target <= 0 || target > game.Config.PlayerNumber))
+            if (useSkill && (target <= 0 || target > game.Config.PlayerNumber))
             {
                 return BadRequest("People you kill is illegal");
             }
 
-            if (kill) game.WerewolfKill(target);
+            if (useSkill) game.WerewolfKill(target);
             game.NextStage();
             GameDB.SetGame(roomId, game);
 
@@ -257,9 +329,9 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("No poeple died");
             }
 
-            if (heal && !game.Config.WitchHealSelf && game.Status.Date != 0 && game.Characters[game.Status.Trace[game.Status.Date].WerewolfKill] == Character.Witch)
+            if (heal && game.Characters[game.Status.Trace[game.Status.Date].WerewolfKill] == Character.Witch && (game.Config.WitchHealSelf == 0 || (game.Config.WitchHealSelf == 1 && game.Status.Date != 0)))
             {
-                return BadRequest("In this game, witch can not heal herself except first night");
+                return BadRequest("In this game, witch can not heal herself now");
             }
 
             if (heal) game.WitchHeal();
@@ -271,7 +343,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult ProphetSkill(string roomId, int sourceSeatNumber, bool check, int target)
+        public IHttpActionResult ProphetSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -294,12 +366,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You are not the prophet");
             }
 
-            if (check && (target <= 0 || target > game.Config.PlayerNumber))
+            if (useSkill && (target <= 0 || target > game.Config.PlayerNumber))
             {
                 return BadRequest("People you check is illegal");
             }
 
-            var result = check ? (game.ProphetCheck(target) == Camp.Werewolf ? "Werewolf" : "Non-werewolf") : "";
+            var result = useSkill ? (game.ProphetCheck(target) == Camp.Werewolf ? "Werewolf" : "Non-werewolf") : "";
             game.NextStage();
             GameDB.SetGame(roomId, game);
 
@@ -307,7 +379,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GuardSkill(string roomId, int sourceSeatNumber, bool guard, int target)
+        public IHttpActionResult GuardSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -330,12 +402,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You are not the guard");
             }
 
-            if (guard && (target <= 0 || target > game.Config.PlayerNumber))
+            if (useSkill && (target <= 0 || target > game.Config.PlayerNumber))
             {
                 return BadRequest("People you guard is illegal");
             }
             
-            if (guard && (game.Status.Date > 0 && game.Status.Trace[game.Status.Date - 1].GuardGuard == target))
+            if (useSkill && (game.Status.Date > 0 && game.Status.Trace[game.Status.Date - 1].GuardGuard == target))
             {
                 return BadRequest("Can not guard the same people as last night");
             }
@@ -348,7 +420,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult DemonSkill(string roomId, int sourceSeatNumber, bool check, int target)
+        public IHttpActionResult DemonSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -371,12 +443,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("You are not the demon");
             }
 
-            if (check && (target <= 0 || target > game.Config.PlayerNumber))
+            if (useSkill && (target <= 0 || target > game.Config.PlayerNumber))
             {
                 return BadRequest("People you check is illegal");
             }
 
-            var result = check ? (game.DemonCheck(target) == Camp.God ? "God" : "Non-god") : "";
+            var result = useSkill ? (game.DemonCheck(target) == Camp.God ? "God" : "Non-god") : "";
             game.NextStage();
             GameDB.SetGame(roomId, game);
 

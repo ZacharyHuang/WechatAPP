@@ -1,21 +1,23 @@
 /* pages/room/createRoom.wxss */
-.godBlock {
-  background-color: lightyellow;
+view {
+  width: 100%;
 }
-.villageBlock {
-  background-color: lightgreen;
+.scroll-section {
+  height: 100%;
+  padding-top: 20%;
 }
-.werewolfBlock {
-  background-color: lightpink;
-}
-.otherBlock {
-  background-color: lightskyblue
+.block {
+  padding: 5px 0;
 }
 .characterView {
   display: flex;
   width: 28%;
   height: 20vw;
   margin: 2%;
+}
+.rule {
+  height: 10vw;
+  padding: 2% 5%;
 }
 .selected {
   box-sizing: border-box;

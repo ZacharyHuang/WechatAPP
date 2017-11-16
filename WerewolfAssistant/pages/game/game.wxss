@@ -9,8 +9,8 @@ image {
   padding-bottom: 10%;
 }
 .image-view {
-  height: 24vw;
-  width: 24vw;
+  height: 20vw;
+  width: 20vw;
 }
 .name-view {
   height: 6vw;

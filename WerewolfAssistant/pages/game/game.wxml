@@ -4,47 +4,47 @@
 <view class="column center scroll-section" scroll-y="true">
   <view class="column center" wx:if="{{config.PlayerNumber<=9}}">
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index<3}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>0&&index<=3}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index>=3&&index<6}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>3&&index<=6}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index>=6&&index<9}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>6&&index<=9}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
   </view>
   <view class="column center" wx:elif="{{config.PlayerNumber>9}}">
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index<4}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>0&&index<=4}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index>=4&&index<8}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>4&&index<=8}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index>=8&&index<12}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>8&&index<=12}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
-      <view wx:for="{{iter}}" wx:if="{{index>=12&&index<16}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
-        <view class="image-view" hidden="{{index>=config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>=config.PlayerNumber}}"><text class="name-text">{{index+1}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      <view wx:for="{{iter}}" wx:if="{{index>12&&index<=16}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
   </view>
@@ -52,16 +52,18 @@
 </view>
 
 <view class="at-bottom" style="width:100%;">
-  <view class="row" wx:if="{{isHost&&gameStatus&&gameStatus!='Prepare'}}">
+  <view class="row" wx:if="{{isHost}}">
     <button style="width:30vw;" bindtap="godView">上帝视角</button>
     <button style="width:40vw;" bindtap="nightInfo">前夜状态</button>
     <button style="width:30vw;" bindtap="gameOver">结束游戏</button>
   </view>
-  <view class="row">
+  <view class="row" wx:if="{{isHost}}">
     <button style="width:30vw;" bindtap="getCharacter">查看身份</button>
-    <button style="width:40vw;" bindtap="prepare" disabled="{{gameStatus&&gameStatus!='Prepare'}}" wx:if="{{!isHost}}">准备</button>
-    <button style="width:40vw;" bindtap="nightFall" wx:elif="{{isHost&&gameStatus&&gameStatus!='Prepare'}}">天黑请闭眼</button>
-    <button style="width:40vw;" bindtap="start" wx:else>开始游戏</button>
+    <button style="width:40vw;" bindtap="nightFall">天黑请闭眼</button>
     <button style="width:30vw;" bindtap="useSkill">使用技能</button>
+  </view>
+  <view class="row" wx:else>
+    <button style="width:50vw;" bindtap="getCharacter">查看身份</button>
+    <button style="width:50vw;" bindtap="useSkill">使用技能</button>
   </view>
 </view>

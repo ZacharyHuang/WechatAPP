@@ -20,7 +20,13 @@ Page({
     cupid: 0,
     demon: 0,
     whiteWerewolf: 0,
-    thief: 0
+    thief: 0,
+    witchHealSelf: 1,
+    witchTwoSkillInOneNight: false,
+    healAndGuardIsDead: true,
+    rule1: "仅首夜",
+    rule2: "不能同时用药",
+    rule3: "会死"
   },
   updatePlayerNumber: function () {
     var playerNumber = this.data.godNumber + this.data.villageNumber + this.data.allWerewolfNumber - this.data.thief
@@ -120,13 +126,38 @@ Page({
     }
   },
 
+  tapRule1: function () {
+    var witchHealSelf = (this.data.witchHealSelf + 1) % 3
+    this.setData({
+      rule1: witchHealSelf == 0 ? "不能自救" : witchHealSelf == 1 ? "仅首夜" : "可以自救",
+      witchHealSelf: witchHealSelf
+    })
+  },
+
+  tapRule2: function () {
+    var witchTwoSkillInOneNight = !this.data.witchTwoSkillInOneNight
+    this.setData({
+      rule2: witchTwoSkillInOneNight ? "可以同时用药" : "不能同时用药",
+      witchTwoSkillInOneNight: witchTwoSkillInOneNight
+    })
+  },
+
+  tapRule3: function () {
+    var healAndGuardIsDead = !this.data.healAndGuardIsDead
+    this.setData({
+      rule3: healAndGuardIsDead ? "会死" : "不会死",
+      healAndGuardIsDead: healAndGuardIsDead
+    })
+  },
+
   submit: function() {
     var gods = (this.data.prophet > 0 ? "预言家，" : "") + (this.data.witch > 0 ? "女巫，" : "") + (this.data.hunter > 0 ? "猎人，" : "") + (this.data.guard > 0 ? "守卫，" : "") + (this.data.idiot > 0 ? "白痴，" : "") + (this.data.cupid > 0 ? "丘比特，" : "")
     var werewolves = (this.data.demon > 0 ? "恶魔，" : "") + (this.data.whiteWerewolf > 0 ? "白狼王，" : "") + this.data.werewolfNumber + "只狼，"
     var villages = "" + this.data.villageNumber + "个村民"
-    var content = "配置：" + gods + werewolves + villages
-    var createGameUrl = app.globalData.backendHost + "/Room/CreateRoom?villageNumber=" + this.data.villageNumber + "&werewolfNumber=" + this.data.werewolfNumber + "&prophet=" + this.data.prophet + "&witch=" + this.data.witch + "&hunter=" + this.data.hunter + "&guard=" + this.data.guard + "&idiot=" + this.data.idiot + "&cupid=" + this.data.cupid + "&demon=" + this.data.demon
-        + "&whiteWerewolf=" + this.data.whiteWerewolf + "&thief=" + this.data.thief
+    var rules = "女巫" + this.data.rule1 + (this.data.rule1.endsWith("自救") ? "" : "可以自救") + "，女巫" + this.data.rule2 + "，同守同救" + this.data.rule3
+    var content = "配置：" + gods + werewolves + villages + "\r\n规则：" + rules
+    var createGameUrl = app.globalData.backendHost + "/Game/CreateGame?villageNumber=" + this.data.villageNumber + "&werewolfNumber=" + this.data.werewolfNumber + "&prophet=" + this.data.prophet + "&witch=" + this.data.witch + "&hunter=" + this.data.hunter + "&guard=" + this.data.guard + "&idiot=" + this.data.idiot + "&cupid=" + this.data.cupid + "&demon=" + this.data.demon
+      + "&whiteWerewolf=" + this.data.whiteWerewolf + "&thief=" + this.data.thief + "&witchHealSelf=" + this.data.witchHealSelf + "&witchTwoSkillInOneNight=" + this.data.witchTwoSkillInOneNight + "&healAndGuardIsDead=" + this.data.healAndGuardIsDead
     wx.showModal({
       title: "确认提交？",
       content: content,

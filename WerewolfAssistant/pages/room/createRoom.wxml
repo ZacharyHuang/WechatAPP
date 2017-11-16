@@ -1,12 +1,14 @@
 <!--pages/room/createRoom.wxml-->
-<view class="center" style="margin:10px">人数：{{playerNumber}}</view>
-<view class="row center">
-  <view style="margin:10px">神：{{godNumber}}</view>
-  <view style="margin:10px">民：{{villageNumber}}</view>
-  <view style="margin:10px">狼：{{allWerewolfNumber}}</view>
+<view class="at-top column center" style="background-color:white;">
+  <view class="center" style="margin:10px">人数：{{playerNumber}}</view>
+  <view class="row center">
+    <view style="margin:0 10px">神：{{godNumber}}</view>
+    <view style="margin:0 10px">民：{{villageNumber}}</view>
+    <view style="margin:0 10px">狼：{{allWerewolfNumber}}</view>
+  </view>
 </view>
-<scroll-view scroll-y="true" >
-  <view class="row godBlock">
+<view class="column center scroll-section" scroll-y="true">
+  <view class="row block">
     <view class="center" style="width:20%">神</view>
     <view style="width:80%">
       <view class="row center">
@@ -21,7 +23,7 @@
       </view>
     </view>
   </view>
-  <view class="row villageBlock">
+  <view class="row block">
     <view class="center" style="width:20%">民</view>
     <view style="width:80%">
       <view class="row">
@@ -45,13 +47,32 @@
       </view>
     </view>
   </view>
-  <view class="row otherBlock">
+  <view class="row block">
     <view class="center" style="width:20%">其他</view>
-    <view style="width:80%">
+    <view class="column center " style="width:80%">
       <view class="row center">
         <view class="characterView center {{thief>0?'selected':''}}" bindtap="tapThief">盗贼</view>
       </view>
     </view>
   </view>
-</scroll-view>
-<view class="at-bottom" style="width:100%;"><button bindtap="submit">确定</button></view>
+  <view class="row block">
+    <view class="center" style="width:20%">规则</view>
+    <view class="column center " style="width:80%">
+      <view class="row center rule">
+        <view class="center" style="width:40%">女巫自救</view>
+        <view class="center" style="width:60%" bindtap="tapRule1">{{rule1}}</view>
+      </view>
+      <view class="row center rule">
+        <view class="center" style="width:40%">女巫用药</view>
+        <view class="center" style="width:60%" bindtap="tapRule2">{{rule2}}</view>
+      </view>
+      <view class="row center rule">
+        <view class="center" style="width:40%">同守同救</view>
+        <view class="center" style="width:60%" bindtap="tapRule3">{{rule3}}</view>
+      </view>
+    </view>
+  </view>
+  <view style="width:100%;">
+    <button bindtap="submit">确定</button>
+  </view>
+</view>
