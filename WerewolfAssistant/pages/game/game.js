@@ -111,7 +111,13 @@ Page({
         console.log(res)
         if (res.statusCode == 200) {
           var stage = res.data
-          that.setData({ stage: stage })
+          console.log("server stage: " + stage)
+          if (that.data.stage != stage) {
+            console.log("stage change: " + that.data.stage + " -> " + stage)
+            that.playSound(that.data.stage, "End")
+            that.setData({ stage: stage })
+            that.playSound(stage, "Start")
+          }
         }
       },
     })
@@ -249,5 +255,51 @@ Page({
         }
       }
     })
+  },
+
+  playSound: function (stage, state) {
+    if (stage == "Prepare") {
+      if (state == "End") console.log("天黑请闭眼")
+    }
+    else if (stage == "DayTime") {
+      if (state == "Start") console.log("天亮了")
+      if (state == "End") console.log("天黑请闭眼")
+    }
+    else if (stage == "ThiefNight") {
+      if (state == "Start") console.log("盗贼请睁眼，盗贼请选牌")
+      if (state == "End") console.log("盗贼请闭眼")
+    }
+    else if (stage == "CupidNight") {
+      if (state == "Start") console.log("丘比特请睁眼，丘比特请指定情侣")
+      if (state == "End") console.log("丘比特请闭眼")
+    }
+    else if (stage == "LoverDayTime") {
+      if (state == "Start") console.log("所有人请睁眼，所有人请点击查看身份，确认是否被丘比特选中")
+      if (state == "End") console.log("所有人请闭眼")
+    }
+    else if (stage == "LoverNight") {
+      if (state == "Start") console.log("情侣请睁眼，情侣请互认")
+      if (state == "End") console.log("情侣请闭眼")
+    }
+    else if (stage == "WerewolfNight") {
+      if (state == "Start") console.log("狼人请睁眼，狼人请互认同伴，狼人请杀人")
+      if (state == "End") console.log("狼人请闭眼")
+    }
+    else if (stage == "WitchNight") {
+      if (state == "Start") console.log("女巫请睁眼，女巫请用药")
+      if (state == "End") console.log("女巫请闭眼")
+    }
+    else if (stage == "ProphetNight") {
+      if (state == "Start") console.log("预言家请睁眼，预言家请验人")
+      if (state == "End") console.log("预言家请闭眼")
+    }
+    else if (stage == "GuardNight") {
+      if (state == "Start") console.log("守卫请睁眼，守卫请守人")
+      if (state == "End") console.log("守卫请闭眼")
+    }
+    else if (stage == "DemonNight") {
+      if (state == "Start") console.log("恶魔请睁眼，恶魔请验人")
+      if (state == "End") console.log("恶魔请闭眼")
+    }
   }
 })

@@ -133,9 +133,9 @@ namespace WerewolfBackend.Controllers
             for (int i = 1; i <= playerNumber; ++i)
             {
                 var player = RoomDB.GetPlayer(roomId, i);
-                if (player.State != PlayerState.Ready)
+                if (player == null || player.State != PlayerState.Ready)
                 {
-                    return BadRequest("Player " + player.SeatNumber + " not ready");
+                    return BadRequest("Player " + i.ToString() + " not ready");
                 }
             }
 
