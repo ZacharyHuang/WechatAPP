@@ -1,0 +1,177 @@
+﻿
+@{
+    ViewBag.Title = "Debug";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Debug</h2>
+
+<div class="container">
+    <div style="width:100%">
+        <input type="text" id="roomId" />
+    </div>
+    <div style="width:100%">
+        <textarea id="infoDiv" style="width:100%"></textarea>
+        <button onclick="sync()">sync</button>
+    </div>
+    <div>
+        <input type="text" id="target1" />
+        <input type="text" id="target2" />
+    </div>
+    <button onclick="genBots()">genBots</button>
+    <button onclick="thief()">thief</button>
+    <button onclick="cupid()">cupid</button>
+    <button onclick="kill()">kill</button>
+    <button onclick="nokill()">nokill</button>
+    <button onclick="nowitch()">skip witch</button>
+    <button onclick="witchheal()">heal</button>
+    <button onclick="witchpoison()">poison</button>
+    <button onclick="witchtwoshot()">witch two shot</button>
+    <button onclick="prophet()">prophet</button>
+    <button onclick="noprophet()">skip prophet</button>
+    <button onclick="guard()">guard</button>
+    <button onclick="noguard()">skip guard</button>
+    <button onclick="demon()">demon</button>
+    <button onclick="nodemon()">skip demon</button>
+</div>
+
+@section scripts{
+<script type="text/javascript">
+    function sync() {
+        var roomId = $("#roomId").val();
+        if (roomId && roomId != "") {
+            $.get("/api/Debug/Infos?roomId="+roomId, function(data) {
+                $("#infoDiv").text(data)
+            })
+        }
+    }
+
+    function genBots() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/GenBots?roomId="+roomId, function(data) {
+            console.log(data);
+        })
+    }
+    function thief() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/ThiefSkill?roomId="+roomId+"&useSkill=true&choice="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function cupid() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        var t2 = $("#target2").val();
+        $.get("/api/Debug/CupidSkill?roomId="+roomId+"&useSkill=true&target1="+t1+"&target2="+t2, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function kill() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/WerewolfSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function nokill() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/WerewolfSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function nowitch() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=false&poison=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function witchheal() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=true&poison=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function witchpoison() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=false&poison=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function witchtwoshot() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=true&poison=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function prophet() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/ProphetSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function noprophet() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/ProphetSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function guard() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/GuardSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function noguard() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/GuardSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function demon() {
+        var roomId = $("#roomId").val();
+        var t1 = $("#target1").val();
+        $.get("/api/Debug/DemonSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+    function nodemon() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/DemonSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(error);
+        })
+    }
+</script>
+}

@@ -66,6 +66,7 @@ namespace WerewolfBackend.Models
             int characterNumber = Config.PlayerNumber + (Config.ThiefNumber > 0 ? 2 : 0);
             List<Character> characters = new List<Character>();
             for (int i = 0; i < Config.ThiefNumber; ++i) characters.Add(Character.Thief);
+            for (int i = 0; i < Config.CupidNumber; ++i) characters.Add(Character.Cupid);
             for (int i = 0; i < Config.ProphetNumber; ++i) characters.Add(Character.Prophet);
             for (int i = 0; i < Config.WitchNumber; ++i) characters.Add(Character.Witch);
             for (int i = 0; i < Config.HunterNumber; ++i) characters.Add(Character.Hunter);
@@ -192,7 +193,7 @@ namespace WerewolfBackend.Models
                 {
                     bool heal = Status.Trace[Status.Date].WitchHeal, guard = Status.Trace[Status.Date].GuardGuard == Status.Trace[Status.Date].WerewolfKill;
                     // demon won't die in the night， no heal no guard or heal guard in a same time will die
-                    if (Characters[Status.Trace[Status.Date].WitchPoison] != Character.Demon && ((heal && guard) || !(heal || guard)))
+                    if (Characters[Status.Trace[Status.Date].WerewolfKill] != Character.Demon && ((heal && guard) || !(heal || guard)))
                     {
                         dead1.Add(Status.Trace[Status.Date].WerewolfKill);
                     }
@@ -215,8 +216,8 @@ namespace WerewolfBackend.Models
                 foreach (var dead in dead1)
                 {
                     dead2.Add(dead);
-                    if (Lovers[0] == dead) dead2.Add(Lovers[1]);
-                    else if (Lovers[1] == dead) dead2.Add(Lovers[0]);
+                    if (Lovers != null && Lovers[0] == dead) dead2.Add(Lovers[1]);
+                    else if (Lovers != null && Lovers[1] == dead) dead2.Add(Lovers[0]);
                 }
                 Status.Trace[Status.Date].Dead = dead2.ToList();
                 // check dead skill
@@ -231,35 +232,35 @@ namespace WerewolfBackend.Models
         }
         public void WerewolfKill(int seatNumber)
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WerewolfKill = seatNumber;
         }
         public void WitchHeal()
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WitchHeal = true;
         }
         public void WitchPoison(int seatNumber)
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WitchPoison = seatNumber;
         }
         public Camp ProphetCheck(int seatNumber)
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].ProphetCheck = seatNumber;
             return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }
         public bool GuardGuard(int seatNumber)
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             if (Status.Date > 0 && seatNumber == Status.Trace[Status.Date - 1].GuardGuard) return false;
             Status.Trace[Status.Date].GuardGuard = seatNumber;
             return true;
         }
         public Camp DemonCheck(int seatNumber)
         {
-            if (Status.Trace.Count < Status.Date) Status.Trace.Add(new GameTrace());
+            if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].DemonCheck = seatNumber;
             return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }

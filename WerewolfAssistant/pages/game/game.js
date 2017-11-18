@@ -228,6 +228,7 @@ Page({
     wx.request({
       url: url,
       success: function (res) {
+        console.log(res)
         if (res.statusCode == 200) {
           var dead = JSON.parse(res.data)
           var content = ""
