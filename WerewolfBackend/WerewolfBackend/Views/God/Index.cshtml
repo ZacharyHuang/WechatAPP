@@ -11,7 +11,7 @@
         <input type="text" id="roomId" />
     </div>
     <div style="width:100%">
-        <textarea id="infoDiv" style="width:100%"></textarea>
+        <textarea id="infoDiv" cols="100" rows="30"></textarea>
         <button onclick="sync()">sync</button>
     </div>
     <div>
@@ -58,7 +58,7 @@
         $.get("/api/Debug/ThiefSkill?roomId="+roomId+"&useSkill=true&choice="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function cupid() {
@@ -68,7 +68,7 @@
         $.get("/api/Debug/CupidSkill?roomId="+roomId+"&useSkill=true&target1="+t1+"&target2="+t2, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function kill() {
@@ -77,7 +77,7 @@
         $.get("/api/Debug/WerewolfSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function nokill() {
@@ -85,7 +85,7 @@
         $.get("/api/Debug/WerewolfSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function nowitch() {
@@ -93,7 +93,7 @@
         $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=false&poison=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function witchheal() {
@@ -101,7 +101,7 @@
         $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=true&poison=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function witchpoison() {
@@ -110,7 +110,7 @@
         $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=false&poison=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function witchtwoshot() {
@@ -119,7 +119,7 @@
         $.get("/api/Debug/WitchSkill?roomId="+roomId+"&heal=true&poison=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function prophet() {
@@ -128,7 +128,7 @@
         $.get("/api/Debug/ProphetSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function noprophet() {
@@ -136,7 +136,7 @@
         $.get("/api/Debug/ProphetSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function guard() {
@@ -145,7 +145,7 @@
         $.get("/api/Debug/GuardSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function noguard() {
@@ -153,7 +153,7 @@
         $.get("/api/Debug/GuardSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function demon() {
@@ -162,7 +162,7 @@
         $.get("/api/Debug/DemonSkill?roomId="+roomId+"&useSkill=true&target="+t1, function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function nodemon() {
@@ -170,7 +170,7 @@
         $.get("/api/Debug/DemonSkill?roomId="+roomId+"&useSkill=false&target=0", function(data) {
             console.log(data);
         }).fail(function (jqXHR, testStatus, error) {
-            console.log(error);
+            console.log(jqXHR.responseJSON.Message);
         })
     }
 </script>

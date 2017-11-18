@@ -14,6 +14,7 @@ namespace WerewolfBackend.Models
         DayTime,
         ThiefNight,
         CupidNight,
+        LoversDayTime,
         LoversNight,
         WerewolfNight,
         WitchNight,
@@ -33,6 +34,7 @@ namespace WerewolfBackend.Models
         public Character[] Characters { get; set; }
         public int[] Lovers { get; set; }
         public int ThiefSeatNumber { get; set; }
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public Character[] ThiefCandidates { get; set; }
         public Game()
         {
@@ -115,6 +117,7 @@ namespace WerewolfBackend.Models
                         break;
                     case Character.Thief:
                         Status.CanThiefChoose = true;
+                        ThiefSeatNumber = i;
                         break;
                     case Character.Cupid:
                         Status.CanCupidMakeCouple = true;

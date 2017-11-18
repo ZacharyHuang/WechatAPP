@@ -164,7 +164,41 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult ThiefSkill(string roomId, int sourceSeatNumber, bool useSkill, int choice)
+        public IHttpActionResult GetThiefCandidates(string roomId, int seatNumber)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (!game.Status.CanThiefChoose)
+            {
+                return BadRequest("Game has no thief");
+            }
+
+            if (game.Status.Stage != GameStage.ThiefNight)
+            {
+                return BadRequest("Not your turn");
+            }
+
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
+            {
+                return BadRequest("Seat number is illegal");
+            }
+
+            if (game.Characters[seatNumber] != Character.Thief)
+            {
+                return BadRequest("You are not the thief");
+            }
+
+            return Ok(JsonConvert.SerializeObject(game.ThiefCandidates.Select(c => c.ToString()).ToList()));
+
+        }
+
+
+        [HttpGet]
+        public IHttpActionResult ThiefSkill(string roomId, int seatNumber, bool useSkill, int choice)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -182,12 +216,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
             
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Thief)
+            if (game.Characters[seatNumber] != Character.Thief)
             {
                 return BadRequest("You are not the thief");
             }
@@ -204,7 +238,7 @@ namespace WerewolfBackend.Controllers
             return Ok();
         }
         [HttpGet]
-        public IHttpActionResult CupidSkill(string roomId, int sourceSeatNumber, bool useSkill, int target1, int target2)
+        public IHttpActionResult CupidSkill(string roomId, int seatNumber, bool useSkill, int target1, int target2)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -222,12 +256,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Cupid)
+            if (game.Characters[seatNumber] != Character.Cupid)
             {
                 return BadRequest("You are not the cupid");
             }
@@ -245,7 +279,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult WerewolfSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
+        public IHttpActionResult WerewolfSkill(string roomId, int seatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -258,12 +292,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Werewolf || game.Characters[sourceSeatNumber] != Character.Demon || game.Characters[sourceSeatNumber] != Character.WhiteWerewolf)
+            if (game.Characters[seatNumber] != Character.Werewolf || game.Characters[seatNumber] != Character.Demon || game.Characters[seatNumber] != Character.WhiteWerewolf)
             {
                 return BadRequest("You can not kill people");
             }
@@ -281,7 +315,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult WitchSkill(string roomId, int sourceSeatNumber, bool heal, bool poison, int target)
+        public IHttpActionResult WitchSkill(string roomId, int seatNumber, bool heal, bool poison, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -294,12 +328,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Witch)
+            if (game.Characters[seatNumber] != Character.Witch)
             {
                 return BadRequest("You are not the witch");
             }
@@ -343,7 +377,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult ProphetSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
+        public IHttpActionResult ProphetSkill(string roomId, int seatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -356,12 +390,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Prophet)
+            if (game.Characters[seatNumber] != Character.Prophet)
             {
                 return BadRequest("You are not the prophet");
             }
@@ -379,7 +413,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult GuardSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
+        public IHttpActionResult GuardSkill(string roomId, int seatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -392,12 +426,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Guard)
+            if (game.Characters[seatNumber] != Character.Guard)
             {
                 return BadRequest("You are not the guard");
             }
@@ -420,7 +454,7 @@ namespace WerewolfBackend.Controllers
         }
 
         [HttpGet]
-        public IHttpActionResult DemonSkill(string roomId, int sourceSeatNumber, bool useSkill, int target)
+        public IHttpActionResult DemonSkill(string roomId, int seatNumber, bool useSkill, int target)
         {
             var game = GameDB.GetGame(roomId);
             if (game == null)
@@ -433,12 +467,12 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Not your turn");
             }
 
-            if (sourceSeatNumber <= 0 || sourceSeatNumber > game.Config.PlayerNumber)
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
             {
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[sourceSeatNumber] != Character.Demon)
+            if (game.Characters[seatNumber] != Character.Demon)
             {
                 return BadRequest("You are not the demon");
             }

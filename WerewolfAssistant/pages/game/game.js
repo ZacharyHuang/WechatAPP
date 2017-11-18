@@ -7,7 +7,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    active: false,
+    syncTimer: null,
+    lastSyncPlayer: null,
+    lastSyncGame: null,
     stage: "Prepare",
     emptySeatAvatar: "/pics/emptySeat.jpg",
     roomId: "",
@@ -42,21 +44,47 @@ Page({
     this.updateGameConfig()
     this.updatePlayers()
     this.updateGameStage()
-    this.syncGameStage()
-    this.syncPlayer()
+    // this.syncGameStage()
+    // this.syncPlayer()
   },
 
   onShow: function () {
-    this.setData({ active: true })
+    if (!this.data.syncTimer) {
+      this.sync()
+    }
   },
 
   onHide: function () {
-    this.setData({ active: false })
+    if (this.data.syncTimer) {
+      clearTimeout(this.data.syncTimer)
+      this.setData({ syncTimer: null })
+    }
   },
 
   onUnload: function () {
-    this.setData({ active: false })
+    clearTimeout(this.data.syncTimer)
+    this.setData({ syncTimer: null })
   },
+
+  sync: function () {
+    var that = this
+    var d = new Date()
+    var now = d.getTime()
+
+    if (!this.data.lastSyncPlayer || now - this.data.lastSyncPlayer >= (this.data.stage == "Prepare" ? 250 : 10000)) {
+      this.updatePlayers()
+      this.setData({ lastSyncPlayer: now })
+    }
+
+    if (!this.data.lastSyncGame || now - this.data.lastSyncGame >= 1000) {
+      this.updateGameStage()
+      this.setData({ lastSyncGame: now })
+    }
+
+    this.setData({ syncTimer: setTimeout(this.sync, 250) })
+  },
+    
+
 
   syncPlayer: function () {
     if (this.data.active && this.data.stage == "Prepare") {
@@ -82,6 +110,15 @@ Page({
         if (res.statusCode == 200) {
           var players = JSON.parse(res.data)
           that.setData({ players: players })
+          for (var i=1; i<=players.length; ++i) {
+            if (players[i] && players[i].UserId == that.data.userId) {
+              that.setData({
+                isHost: i == 1,
+                seatNumber: i
+              })
+              break;
+            }
+          }
         }
       },
     })
@@ -258,6 +295,54 @@ Page({
     })
   },
 
+  useSkill: function () {
+    if (!this.data.character) {
+      this.getCharacter()
+    }
+
+    if (this.data.character == "Thief") {
+      this.thiefSkill()
+    }
+  },
+
+  thiefSkill: function() {
+    var that = this
+    var url = app.globalData.backendHost + "/Game/GetThiefCandidates?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
+    wx.request({
+      url: url,
+      success: function (res) {
+        console.log(res)
+        if (res.statusCode == 200) {
+          var cand = JSON.parse(res.data)
+          wx.showModal({
+            title: '请选择身份',
+            content: "1:" + cand[1] + " or 2:" + cand[0],
+            confirmText: "2",
+            cancelText: "1",
+            success: function () {
+              url = app.globalData.backendHost + "/Game/ThiefSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&useSkill=true&choice=0"
+              wx.request({
+                url: url,
+                success: function (res) {
+                  console.log(res)
+                }
+              })
+            },
+            fail: function () {
+              url = app.globalData.backendHost + "/Game/ThiefSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&useSkill=true&choice=1"
+              wx.request({
+                url: url,
+                success: function (res) {
+                  console.log(res)
+                }
+              })
+            }
+          })
+        }
+      }
+    })
+  },
+
   playSound: function (stage, state) {
     if (stage == "Prepare") {
       if (state == "End") console.log("天黑请闭眼")
@@ -274,11 +359,11 @@ Page({
       if (state == "Start") console.log("丘比特请睁眼，丘比特请指定情侣")
       if (state == "End") console.log("丘比特请闭眼")
     }
-    else if (stage == "LoverDayTime") {
-      if (state == "Start") console.log("所有人请睁眼，所有人请点击查看身份，确认是否被丘比特选中")
+    else if (stage == "LoversDayTime") {
+      if (state == "Start") console.log("所有人请睁眼，请点击查看身份，确认是否被丘比特选中")
       if (state == "End") console.log("所有人请闭眼")
     }
-    else if (stage == "LoverNight") {
+    else if (stage == "LoversNight") {
       if (state == "Start") console.log("情侣请睁眼，情侣请互认")
       if (state == "End") console.log("情侣请闭眼")
     }
