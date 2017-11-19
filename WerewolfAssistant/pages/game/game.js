@@ -83,22 +83,6 @@ Page({
 
     this.setData({ syncTimer: setTimeout(this.sync, 250) })
   },
-    
-
-
-  syncPlayer: function () {
-    if (this.data.active && this.data.stage == "Prepare") {
-      this.updatePlayers()
-    }
-    setTimeout(this.syncPlayer, this.data.stage == "Prepare" ? 250 : 10000)
-  },
-
-  syncGameStage: function () {
-    if (this.data.active) {
-      this.updateGameStage()
-    }
-    setTimeout(this.syncGameStage, 1000)
-  },
 
   updatePlayers: function () {
     var that = this
@@ -122,6 +106,17 @@ Page({
         }
       },
     })
+    if (this.data.stage != "Prepare" && !this.data.character) {
+      var characterUrl = app.globalData.backendHost + "/Game/GetCharacter?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
+      wx.request({
+        url: characterUrl,
+        success: function (res) {
+          if (res.statusCode == 200) {
+            that.setData({ character: res.data })
+          }
+        }
+      })
+    }
   },
 
   updateGameConfig: function () {
@@ -162,57 +157,91 @@ Page({
 
   tapSeat: function (e) {
     var that = this
-    var url = ""
     var seatNumber = Number(e.currentTarget.dataset.seatnumber)
 
-    if (this.data.players[seatNumber] && this.data.players[seatNumber].UserId == this.data.userId) {
-      url = app.globalData.backendHost + "/Room/LeaveSeat?roomId=" + this.data.roomId + "&userId=" + this.data.userId
-      wx.request({
-        url: url,
-        success: function (res) {
-          if (res.statusCode == 200) {
-            that.setData({
-              isHost: false,
-              seatNumber: -1
-            })
-          }
-          else {
-            wx.showModal({
-              title: '离座失败',
-              content: res.data.Message,
-              showCancel: false
-            })
-          }
-        },
-        complete: function () {
-          that.updatePlayers()
-        }
-      })
+    if (this.data.stage == "Prepare") {
+      if (this.data.players[seatNumber] && this.data.players[seatNumber].UserId == this.data.userId) {
+        this.leaveSeat(seatNumber)
+      }
+      else {
+        this.takeSeat(seatNumber)
+      }
     }
-    else {
-      url = app.globalData.backendHost + "/Room/TakeSeat?roomId=" + this.data.roomId + "&seatNumber=" + seatNumber + "&userId=" + this.data.userId + "&userName=" + this.data.userName + "&avatarUrl=" + this.data.userAvatar
-      wx.request({
-        url: url,
-        success: function (res) {
-          if (res.statusCode == 200) {
-            that.setData({
-              isHost: seatNumber == 1,
-              seatNumber: seatNumber
-            })
-          }
-          else {
-            wx.showModal({
-              title: '占座失败',
-              content: res.data.Message,
-              showCancel: false
-            })
-          }
-        },
-        complete: function () {
-          that.updatePlayers()
-        }
-      })
+    else if (this.data.stage == "CupidNight") {
+
     }
+    else if (this.data.stage == "WerewolfNight") {
+      this.werewolfSkill(seatNumber)
+    }
+  },
+
+  takeSeat(seatNumber) {
+    var url = app.globalData.backendHost + "/Room/TakeSeat?roomId=" + this.data.roomId + "&seatNumber=" + seatNumber + "&userId=" + this.data.userId + "&userName=" + this.data.userName + "&avatarUrl=" + this.data.userAvatar
+    wx.request({
+      url: url,
+      success: function (res) {
+        if (res.statusCode == 200) {
+          that.setData({
+            isHost: seatNumber == 1,
+            seatNumber: seatNumber
+          })
+        }
+        else {
+          wx.showModal({
+            title: '占座失败',
+            content: res.data.Message,
+            showCancel: false
+          })
+        }
+      },
+      complete: function () {
+        that.updatePlayers()
+      }
+    })
+  },
+
+  leaveSeat: function (seatNumber) {
+    var url = app.globalData.backendHost + "/Room/LeaveSeat?roomId=" + this.data.roomId + "&userId=" + this.data.userId
+    wx.request({
+      url: url,
+      success: function (res) {
+        if (res.statusCode == 200) {
+          that.setData({
+            isHost: false,
+            seatNumber: -1
+          })
+        }
+        else {
+          wx.showModal({
+            title: '离座失败',
+            content: res.data.Message,
+            showCancel: false
+          })
+        }
+      },
+      complete: function () {
+        that.updatePlayers()
+      }
+    })
+  },
+
+  updateCharacer: function () {
+    var url = app.globalData.backendHost + "/Game/GetCharacter?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
+    wx.request({
+      url: url,
+      success: function (res) {
+        if (res.statusCode == 200) {
+          that.setData({ character: res.data })
+        }
+        else {
+          wx.showModal({
+            title: '无法获得身份信息',
+            content: res.data.Message,
+            showCancel: false
+          })
+        }
+      }
+    })
   },
 
   getCharacter: function () {
@@ -221,27 +250,14 @@ Page({
     wx.request({
       url: readyUrl
     })
-    var characterUrl = app.globalData.backendHost + "/Game/GetCharacter?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
-    wx.request({
-      url: characterUrl,
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.setData({ character: res.data })
-          wx.showModal({
-            title: '身份信息',
-            content: res.data,
-            showCancel: false
-          })
-        }
-        else {
-          wx.showModal({
-            title: '错误信息',
-            content: res.data.Message,
-            showCancel: false
-          })
-        }
-      }
-    })
+    this.updateCharacter()
+    if (this.data.character && this.data.character != "") {
+      wx.showModal({
+        title: '身份信息',
+        content: this.data.character,
+        showCancel: false
+      })
+    }
   },
 
   nightFall: function () {
@@ -295,13 +311,55 @@ Page({
     })
   },
 
+  werewolfSkill: function (target) {
+    var that = this
+    wx.showModal({
+      title: '目标确认',
+      content: "确认杀死" + target + "号玩家？",
+      success: function () {
+        var url = app.globalData.backendHost + "/Game/WerewolfSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&useSkill=true&target=" + target
+        wx.request({
+          url: url,
+          success: function (res) {
+            if (res.statusCode != 200) {
+              wx.showModal({
+                title: '错误信息',
+                content: res.data.Message,
+                showCancel: false
+              })
+            }
+          }
+        })
+      }
+    })
+  },
+
   useSkill: function () {
+    var that = this
     if (!this.data.character) {
-      this.getCharacter()
+      this.updateCharacter()
     }
 
     if (this.data.character == "Thief") {
       this.thiefSkill()
+    }
+
+    if (this.data.character == "Cupid") {
+
+    }
+
+    if (this.data.character == "Werewolf" || this.data.character == "Demon" || this.data.character == "WhiteWerewolf") {
+      wx.showModal({
+        title: '狼人技能',
+        content: '使用技能：确认后请点击目标座位\r\n不使用技能：请点击取消',
+        fail: function() {
+          var url = app.globalData.backendHost + "/Game/WerewolfSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&useSkill=false&target=0"
+        }
+      })
+    }
+
+    if (this.data.character == "Prophet") {
+      
     }
   },
 
@@ -339,6 +397,51 @@ Page({
             }
           })
         }
+      }
+    })
+  },
+
+  prophetSkill: function (target) {
+    var that = this
+    wx.showModal({
+      title: '目标确认',
+      content: "确认检验" + target + "号玩家的身份？",
+      success: function () {
+        var url = app.globalData.backendHost + "/Game/ProphetSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&useSkill=true&target=" + target
+        wx.request({
+          url: url,
+          success: function (res) {
+            if (res.statusCode != 200) {
+              wx.showModal({
+                title: '错误信息',
+                content: res.data.Message,
+                showCancel: false
+              })
+            }
+          }
+        })
+      }
+    })
+  },
+
+  witchPoison: function (heal, poison, target) {
+    wx.showModal({
+      title: '目标确认',
+      content: "确认毒死" + target + "号玩家？",
+      success: function () {
+        var url = app.globalData.backendHost + "/Game/WitchSkill?roomId=" + that.data.roomId + "&seatNumber=" + that.data.seatNumber + "&heal=" + heal + "&poison=" + poison + "&target=" + target
+        wx.request({
+          url: url,
+          success: function (res) {
+            if (res.statusCode != 200) {
+              wx.showModal({
+                title: '错误信息',
+                content: res.data.Message,
+                showCancel: false
+              })
+            }
+          }
+        })
       }
     })
   },
