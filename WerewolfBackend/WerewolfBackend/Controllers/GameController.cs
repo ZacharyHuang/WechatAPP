@@ -160,7 +160,44 @@ namespace WerewolfBackend.Controllers
 
             var dead = game.Status.Trace[game.Status.Date - 1].Dead;
 
-            return Ok(dead);
+            return Ok(JsonConvert.SerializeObject(dead));
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetWitchInfo(string roomId, int seatNumber)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (game.Status.Stage != GameStage.WitchNight)
+            {
+                return BadRequest("Not your turn");
+            }
+
+            if (seatNumber <= 0 || seatNumber > game.Config.PlayerNumber)
+            {
+                return BadRequest("Seat number is illegal");
+            }
+
+            if (game.Characters[seatNumber] != Character.Witch)
+            {
+                return BadRequest("You are not the witch");
+            }
+
+            if (!game.Status.CanWitchHeal)
+            {
+                return Ok("Unknown");
+            }
+
+            int killed = game.Status.Trace[game.Status.Date].WerewolfKill;
+            if (killed == 0)
+            {
+                return Ok("None");
+            }
+            return Ok(killed.ToString());
         }
 
         [HttpGet]

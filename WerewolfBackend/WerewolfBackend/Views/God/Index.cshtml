@@ -19,6 +19,7 @@
         <input type="text" id="target2" />
     </div>
     <button onclick="genBots()">genBots</button>
+    <button onclick="start()">start</button>
     <button onclick="thief()">thief</button>
     <button onclick="cupid()">cupid</button>
     <button onclick="kill()">kill</button>
@@ -50,6 +51,14 @@
         var roomId = $("#roomId").val();
         $.get("/api/Debug/GenBots?roomId="+roomId, function(data) {
             console.log(data);
+        })
+    }
+    function start() {
+        var roomId = $("#roomId").val();
+        $.get("/api/Debug/NightFall?roomId=" + roomId, function (data) {
+            console.log(data);
+        }).fail(function (jqXHR, testStatus, error) {
+            console.log(jqXHR.responseJSON.Message);
         })
     }
     function thief() {

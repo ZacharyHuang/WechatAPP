@@ -63,7 +63,7 @@ Page({
   },
   joinRoom2: function () {
     wx.navigateTo({
-      url: '../game/game?roomId=158579',
+      url: '../game/game?roomId=291449',
     })
   }
 })

@@ -51,6 +51,34 @@ namespace WerewolfBackend.Controllers
             return Ok();
         }
         [HttpGet]
+        public IHttpActionResult NightFall(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            if (game.Status.Stage != GameStage.Prepare && game.Status.Stage != GameStage.DayTime)
+            {
+                return BadRequest("Not now");
+            }
+
+            int playerNumber = game.Config.PlayerNumber;
+            for (int i = 1; i <= playerNumber; ++i)
+            {
+                var player = RoomDB.GetPlayer(roomId, i);
+                if (player == null || player.State != PlayerState.Ready)
+                {
+                    return BadRequest("Player " + i.ToString() + " not ready");
+                }
+            }
+
+            game.NextStage();
+
+            return Ok();
+        }
+        [HttpGet]
         public IHttpActionResult ThiefSkill(string roomId, bool useSkill, int choice)
         {
             var game = GameDB.GetGame(roomId);
