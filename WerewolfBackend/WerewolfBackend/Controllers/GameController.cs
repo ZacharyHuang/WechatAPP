@@ -75,6 +75,25 @@ namespace WerewolfBackend.Controllers
             GameDB.SetGame(roomId, game);
             return Ok(roomId);
         }
+
+        [HttpGet]
+        public IHttpActionResult GameOver(string roomId)
+        {
+            var game = GameDB.GetGame(roomId);
+            if (game == null)
+            {
+                return BadRequest("Game not exist");
+            }
+
+            for (int i = 0; i < 20; ++i)
+            {
+                RoomDB.RemovePlayer(roomId, i);
+            }
+            GameDB.RemoveGame(roomId);
+
+            return Ok();
+        }
+
         [HttpGet]
         public IHttpActionResult GetGameConfig(string roomId)
         {
@@ -334,7 +353,7 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Seat number is illegal");
             }
 
-            if (game.Characters[seatNumber] != Character.Werewolf || game.Characters[seatNumber] != Character.Demon || game.Characters[seatNumber] != Character.WhiteWerewolf)
+            if (game.Characters[seatNumber] != Character.Werewolf && game.Characters[seatNumber] != Character.Demon && game.Characters[seatNumber] != Character.WhiteWerewolf)
             {
                 return BadRequest("You can not kill people");
             }

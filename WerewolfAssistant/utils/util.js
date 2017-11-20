@@ -14,6 +14,10 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const sleep = function (ms) {
+  new Promise(resolve => setTimeout(resolve, ms))
+}
+
 module.exports = {
   formatTime: formatTime
 }

@@ -35,8 +35,8 @@ App({
   },
   globalData: {
     userInfo: null,
-    //backendHost: "http://werewolfassistant.azurewebsites.net/api",
-    backendHost: "http://localhost:18761/api",
+    backendHost: "http://werewolfassistant.azurewebsites.net/api",
+    //backendHost: "http://localhost:18761/api",
     debug: null
   }
 })

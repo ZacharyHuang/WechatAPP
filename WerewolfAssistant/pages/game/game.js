@@ -1,5 +1,34 @@
 // pages/game/game.js
 const app = getApp()
+const innerAudioContext = wx.createInnerAudioContext()
+const stageEndSound = {
+  "Prepare": "/voices/nightFall.mp3",
+  "DayTime": "/voices/nightFall.mp3",
+  "ThiefNight": "/voices/thiefEnd.mp3",
+  "CupidNight": "/voices/cupidEnd.mp3",
+  "LoversDayTime": "/voices/loverDayEnd.mp3",
+  "LoversNight": "/voices/loverNightEnd.mp3",
+  "WerewolfNight": "/voices/werewolfEnd.mp3",
+  "WitchNight": "/voices/witchEnd.mp3",
+  "ProphetNight": "/voices/prophetEnd.mp3",
+  "GuardNight": "/voices/guardEnd.mp3",
+  "DemonNight": "/voices/demonEnd.mp3"
+}
+
+const stageBeginSound = {
+  "DayTime": "/voices/dayTime.mp3",
+  "ThiefNight": "/voices/thiefBegin.mp3",
+  "CupidNight": "/voices/cupidBegin.mp3",
+  "LoversDayTime": "/voices/loverDayBegin.mp3",
+  "LoversNight": "/voices/loverNightBegin.mp3",
+  "WerewolfNight": "/voices/werewolfBegin.mp3",
+  "WitchNight": "/voices/witchBegin.mp3",
+  "ProphetNight": "/voices/prophetBegin.mp3",
+  "GuardNight": "/voices/guardBegin.mp3",
+  "DemonNight": "/voices/demonBegin.mp3"
+}
+
+var isAudioPlaying = false
 
 Page({
 
@@ -24,7 +53,7 @@ Page({
     tapActive: false,
     lover1: null,
     witchHeal: false,
-    iter: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    iter: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
   },
 
   /**
@@ -41,7 +70,7 @@ Page({
       userName: userName,
       userAvatar: userAvatar
     })
-    
+
     this.updateGameConfig()
     this.updatePlayers()
     this.updateGameStage()
@@ -95,7 +124,7 @@ Page({
         if (res.statusCode == 200) {
           var players = JSON.parse(res.data)
           that.setData({ players: players })
-          for (var i=1; i<=players.length; ++i) {
+          for (var i = 1; i <= players.length; ++i) {
             if (players[i] && players[i].UserId == that.data.userId) {
               that.setData({
                 isHost: i == 1,
@@ -147,9 +176,9 @@ Page({
           console.log("server stage: " + stage)
           if (that.data.stage != stage) {
             console.log("stage change: " + that.data.stage + " -> " + stage)
-            that.playSound(that.data.stage, "End")
+            that.playSound(stageEndSound[that.data.stage])
             that.setData({ stage: stage })
-            that.playSound(stage, "Start")
+            that.playSound(stageBeginSound[stage])
           }
         }
       },
@@ -475,13 +504,15 @@ Page({
       })
     }
 
-    if ((this.data.character == "Werewolf" || this.data.character == "Demon" || this.data.character == "WhiteWerewolf") && this.data.stage == "CupidNight") {
+    if ((this.data.character == "Werewolf" || this.data.character == "Demon" || this.data.character == "WhiteWerewolf") && this.data.stage == "WerewolfNight") {
       this.setData({ tapActive: true })
       wx.showModal({
         title: '狼人技能',
         content: '使用技能：确认后请点击目标座位\r\n不使用技能：请点击取消',
-        fail: function() {
-          that.skillRequest("WerewolfSkill", false, 0)
+        success: function (res) {
+          if (res.cancel) {
+            that.skillRequest("WerewolfSkill", false, 0)
+          }
         }
       })
     }
@@ -495,8 +526,10 @@ Page({
       wx.showModal({
         title: '预言家技能',
         content: '使用技能：确认后请点击目标座位\r\n不使用技能：请点击取消',
-        fail: function () {
-          that.skillRequest("ProphetSkill", false, 0)
+        success: function (res) {
+          if (res.cancel) {
+            that.skillRequest("ProphetSkill", false, 0)
+          }
         }
       })
     }
@@ -506,8 +539,10 @@ Page({
       wx.showModal({
         title: '守卫技能',
         content: '使用技能：确认后请点击目标座位\r\n不使用技能：请点击取消',
-        fail: function () {
-          that.skillRequest("GuardSkill", false, 0)
+        success: function (res) {
+          if (res.cancel) {
+            that.skillRequest("GuardSkill", false, 0)
+          }
         }
       })
     }
@@ -526,11 +561,13 @@ Page({
             content: "1:" + cand[1] + " or 2:" + cand[0],
             confirmText: "2",
             cancelText: "1",
-            success: function () {
-              that.skillRequest("ThiefSkill", true, 0)
-            },
-            fail: function () {
-              that.skillRequest("ThiefSkill", true, 1)
+            success: function (res) {
+              if (res.confirm) {
+                that.skillRequest("ThiefSkill", true, 0)
+              }
+              else if (res.cancel) {
+                that.skillRequest("ThiefSkill", true, 1)
+              }
             }
           })
         }
@@ -575,8 +612,10 @@ Page({
               wx.showModal({
                 title: '女巫毒药',
                 content: '使用毒药：确认后请点击目标座位\r\n不使用毒药：请点击取消',
-                fail: function () {
-                  that.skillRequest("WitchSkill", false, 0, that.data.witchHeal)
+                success: function (res) {
+                  if (res.cancel) {
+                    that.skillRequest("WitchSkill", false, 0, that.data.witchHeal)
+                  }
                 },
                 complete: function () {
                   that.setDate({ witchHeal: null })
@@ -589,50 +628,43 @@ Page({
     })
   },
 
+  gameOver: function () {
+    var url = app.globalData.backendHost + "/Game/GameOver?roomId=" + this.data.roomId
+    wx.request({
+      url: url,
+      success: function (res) {
+        if (res.statusCode == 200) {
+          wx.redirectTo({
+            url: '../index/index',
+          })
+        }
+        else {
+          wx.showModal({
+            title: '错误信息',
+            content: res.data.Message,
+            showCancel: false
+          })
+        }
+      }
+    })
+  },
 
-  playSound: function (stage, state) {
-    if (stage == "Prepare") {
-      if (state == "End") console.log("天黑请闭眼")
-    }
-    else if (stage == "DayTime") {
-      if (state == "Start") console.log("天亮了")
-      if (state == "End") console.log("天黑请闭眼")
-    }
-    else if (stage == "ThiefNight") {
-      if (state == "Start") console.log("盗贼请睁眼，盗贼请选牌")
-      if (state == "End") console.log("盗贼请闭眼")
-    }
-    else if (stage == "CupidNight") {
-      if (state == "Start") console.log("丘比特请睁眼，丘比特请指定情侣")
-      if (state == "End") console.log("丘比特请闭眼")
-    }
-    else if (stage == "LoversDayTime") {
-      if (state == "Start") console.log("所有人请睁眼，请点击查看身份，确认是否被丘比特选中")
-      if (state == "End") console.log("所有人请闭眼")
-    }
-    else if (stage == "LoversNight") {
-      if (state == "Start") console.log("情侣请睁眼，情侣请互认")
-      if (state == "End") console.log("情侣请闭眼")
-    }
-    else if (stage == "WerewolfNight") {
-      if (state == "Start") console.log("狼人请睁眼，狼人请互认同伴，狼人请杀人")
-      if (state == "End") console.log("狼人请闭眼")
-    }
-    else if (stage == "WitchNight") {
-      if (state == "Start") console.log("女巫请睁眼，女巫请用药")
-      if (state == "End") console.log("女巫请闭眼")
-    }
-    else if (stage == "ProphetNight") {
-      if (state == "Start") console.log("预言家请睁眼，预言家请验人")
-      if (state == "End") console.log("预言家请闭眼")
-    }
-    else if (stage == "GuardNight") {
-      if (state == "Start") console.log("守卫请睁眼，守卫请守人")
-      if (state == "End") console.log("守卫请闭眼")
-    }
-    else if (stage == "DemonNight") {
-      if (state == "Start") console.log("恶魔请睁眼，恶魔请验人")
-      if (state == "End") console.log("恶魔请闭眼")
+  playSound: function (sound) {
+    var that = this
+    if (sound) {
+      if (isAudioPlaying) {
+        setTimeout(function () {
+          that.playSound(sound)
+        }, 500)
+      }
+      else {
+        console.log("play " + sound)
+        isAudioPlaying = true
+        innerAudioContext.src = sound
+        innerAudioContext.onEnded(function () { isAudioPlaying = false })
+        innerAudioContext.play()
+      }
+
     }
   }
 })
