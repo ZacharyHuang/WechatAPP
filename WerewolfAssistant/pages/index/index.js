@@ -9,12 +9,7 @@ Page({
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
-  //事件处理函数
-  bindViewTap: function() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
-  },
+  
   onLoad: function () {
     if (app.globalData.userInfo) {
       this.setData({
@@ -52,18 +47,13 @@ Page({
     })
   },
   createRoom: function() {
-    wx.navigateTo({
+    wx.redirectTo({
       url: '../room/createRoom',
     })
   },
   joinRoom: function() {
-    wx.navigateTo({
+    wx.redirectTo({
       url: '../room/joinRoom',
-    })
-  },
-  joinRoom2: function () {
-    wx.navigateTo({
-      url: '../game/game?roomId=108376',
     })
   }
 })

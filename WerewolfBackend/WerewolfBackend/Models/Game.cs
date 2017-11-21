@@ -254,6 +254,11 @@ namespace WerewolfBackend.Models
                 Task.Delay(7000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
                 _nextStage();
             }
+            if (Status.Stage == GameStage.LoversNight)
+            {
+                Task.Delay(7000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
             if (Status.Stage == GameStage.WitchNight && !Status.CanWitchHeal && ! Status.CanWitchPoison)
             {
                 Task.Delay(5000 + RandomUtil.GenRandomInt(4) * 1000).Wait();

@@ -6,8 +6,8 @@ const stageEndSound = {
   "DayTime": "/voices/nightFall.mp3",
   "ThiefNight": "/voices/thiefEnd.mp3",
   "CupidNight": "/voices/cupidEnd.mp3",
-  "LoversDayTime": "/voices/loverDayEnd.mp3",
-  "LoversNight": "/voices/loverNightEnd.mp3",
+  "LoversDayTime": "/voices/loversDayEnd.mp3",
+  "LoversNight": "/voices/loversNightEnd.mp3",
   "WerewolfNight": "/voices/werewolfEnd.mp3",
   "WitchNight": "/voices/witchEnd.mp3",
   "ProphetNight": "/voices/prophetEnd.mp3",
@@ -19,8 +19,8 @@ const stageBeginSound = {
   "DayTime": "/voices/dayTime.mp3",
   "ThiefNight": "/voices/thiefBegin.mp3",
   "CupidNight": "/voices/cupidBegin.mp3",
-  "LoversDayTime": "/voices/loverDayBegin.mp3",
-  "LoversNight": "/voices/loverNightBegin.mp3",
+  "LoversDayTime": "/voices/loversDayBegin.mp3",
+  "LoversNight": "/voices/loversNightBegin.mp3",
   "WerewolfNight": "/voices/werewolfBegin.mp3",
   "WitchNight": "/voices/witchBegin.mp3",
   "ProphetNight": "/voices/prophetBegin.mp3",
@@ -48,7 +48,6 @@ Page({
     userAvatar: "",
     isHost: false,
     seatNumber: -1,
-    isReady: false,
     players: [],
     character: "",
     tapActive: false,
@@ -175,11 +174,11 @@ Page({
         if (res.statusCode == 200) {
           var stage = res.data
           if (that.data.stage != stage) {
-            if (that.isHost) {
+            if (that.data.isHost) {
               that.playSound(stageEndSound[that.data.stage])
             }
             that.setData({ stage: stage })
-            if (that.isHost) {
+            if (that.data.isHost) {
               that.playSound(stageBeginSound[stage])
             }
           }
@@ -195,7 +194,8 @@ Page({
       url: url,
       success: function (res) {
         if (res.statusCode == 200) {
-          that.setData({ character: res.data })
+          var characterInfo = JSON.parse(res.data)
+          that.setData({ character: characterInfo.Character })
         }
         else {
           wx.showModal({
@@ -454,7 +454,7 @@ Page({
 
   witchTap: function (target) {
     var that = this
-    witchHeal = this.data.witchHeal
+    var witchHeal = this.data.witchHeal
     var content = "确认" + (witchHeal ? "" : "不") + "使用解药并毒死" + target + "号玩家？"
     wx.showModal({
       title: '目标确认',
@@ -589,7 +589,8 @@ Page({
   },
 
   witchSkill: function () {
-    this.setDate({ witchHeal: false, tapActive: true })
+    var that = this
+    this.setData({ witchHeal: false, tapActive: true })
     var url = app.globalData.backendHost + "/Game/GetWitchInfo?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
     wx.request({
       url: url,
@@ -613,7 +614,7 @@ Page({
             cancelText: "不救",
             success: function () {
               if (canHeal) {
-                that.setDate({ witchHeal: true })
+                that.setData({ witchHeal: true })
               }
               else {
                 wx.showToast({
@@ -631,7 +632,7 @@ Page({
                   }
                 },
                 complete: function () {
-                  that.setDate({ witchHeal: null })
+                  that.setData({ witchHeal: null })
                 }
               })
             }
