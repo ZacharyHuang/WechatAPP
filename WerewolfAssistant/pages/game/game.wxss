@@ -16,6 +16,9 @@ image {
   height: 6vw;
   width: 24vw;
 }
+.selected {
+  color: red;
+}
 .name-text {
   font-size: small;
   overflow: hidden;

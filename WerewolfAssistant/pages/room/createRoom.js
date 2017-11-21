@@ -120,7 +120,7 @@ Page({
   },
 
   decreaseVillage: function () {
-    if (this.data.werewolfNumber > 0) {
+    if (this.data.villageNumber > 0) {
       this.setData({ villageNumber: this.data.villageNumber - 1 })
       this.updatePlayerNumber()
     }

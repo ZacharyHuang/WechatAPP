@@ -6,19 +6,19 @@
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>0&&index<=3}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>3&&index<=6}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>6&&index<=9}}" class= "seat-lg column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
   </view>
@@ -26,25 +26,31 @@
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>0&&index<=4}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>4&&index<=8}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>8&&index<=12}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
     <view class="row center" style="width:96vw">
       <view wx:for="{{iter}}" wx:if="{{index>12&&index<=16}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
         <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
-        <view class="name-view center" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
+      </view>
+    </view>
+    <view class="row center" style="width:96vw">
+      <view wx:for="{{iter}}" wx:if="{{index>16&&index<=20}}" class= "seat-sm column center" data-seatNumber="{{index}}" bindtap="tapSeat">
+        <view class="image-view" hidden="{{index>config.PlayerNumber}}"><image src="{{players[index]?players[index].AvatarUrl:emptySeatAvatar}}"></image></view>
+        <view class="name-view center {{lover1==index?'selected':''}}" hidden="{{index>config.PlayerNumber}}"><text class="name-text">{{index}}. {{players[index]?players[index].UserName:"空座"}}</text></view>
       </view>
     </view>
   </view>

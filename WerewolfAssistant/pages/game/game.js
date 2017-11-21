@@ -37,9 +37,10 @@ Page({
    */
   data: {
     syncTimer: null,
+    soundTimer: null,
     lastSyncPlayer: null,
     lastSyncGame: null,
-    stage: "Prepare",
+    stage: null,
     emptySeatAvatar: "/pics/emptySeat.jpg",
     roomId: "",
     userId: "",
@@ -173,12 +174,14 @@ Page({
         console.log(res)
         if (res.statusCode == 200) {
           var stage = res.data
-          console.log("server stage: " + stage)
           if (that.data.stage != stage) {
-            console.log("stage change: " + that.data.stage + " -> " + stage)
-            that.playSound(stageEndSound[that.data.stage])
+            if (that.isHost) {
+              that.playSound(stageEndSound[that.data.stage])
+            }
             that.setData({ stage: stage })
-            that.playSound(stageBeginSound[stage])
+            if (that.isHost) {
+              that.playSound(stageBeginSound[stage])
+            }
           }
         }
       },
@@ -207,19 +210,23 @@ Page({
 
   getCharacter: function () {
     var that = this
-    var readyUrl = app.globalData.backendHost + "/Room/Prepare?roomId=" + this.data.roomId + "&userId=" + this.data.userId
-    wx.request({
-      url: readyUrl
-    })
+    if (this.data.stage == "Prepare" && this.data.seatNumber && this.data.players[this.data.seatNumber] != "Ready") {
+      var readyUrl = app.globalData.backendHost + "/Room/Prepare?roomId=" + this.data.roomId + "&userId=" + this.data.userId
+      wx.request({
+        url: readyUrl
+      })
+    }
     var characterUrl = app.globalData.backendHost + "/Game/GetCharacter?roomId=" + this.data.roomId + "&seatNumber=" + this.data.seatNumber
     wx.request({
       url: characterUrl,
       success: function (res) {
         if (res.statusCode == 200) {
-          that.setData({ character: res.data })
+          var characterInfo = JSON.parse(res.data)
+          that.setData({ character: characterInfo.Character })
+          var content = characterInfo.Character + (characterInfo.IsLover == true ? "\r\nYou are one of the couple" : characterInfo.IsLover == false ? "\r\nYou are not one of the couple" : "")
           wx.showModal({
             title: '身份信息',
-            content: res.data,
+            content: content,
             showCancel: false
           })
         }
@@ -310,6 +317,9 @@ Page({
               content: res.data,
               showCancel: false
             })
+          }
+          else if (action == "ThiefSkill") {
+            that.updateCharacter()
           }
           that.setData({ tapActive: false })
         }
@@ -410,14 +420,17 @@ Page({
   },
 
   cupidTap: function (target) {
+    var that = this
     var lover1 = this.data.lover1
     if (lover1) {
       if (target != lover1) {
         wx.showModal({
           title: '目标确认',
           content: "确认连接" + lover1 + "号玩家与" + target + "号玩家成为情侣？",
-          success: function () {
-            skillRequest("CupidSkill", true, lover1, target)
+          success: function (res) {
+            if (res.confirm) {
+              that.skillRequest("CupidSkill", true, lover1, target)
+            }
           }
         })
       }
@@ -487,7 +500,7 @@ Page({
 
   useSkill: function () {
     var that = this
-    if (!this.data.character) {
+    if (!this.data.character || this.data.character == "") {
       this.updateCharacter()
     }
 
@@ -629,6 +642,8 @@ Page({
   },
 
   gameOver: function () {
+    clearTimeout(this.data.syncTimer)
+    this.setData({ syncTimer: null })
     var url = app.globalData.backendHost + "/Game/GameOver?roomId=" + this.data.roomId
     wx.request({
       url: url,
@@ -653,12 +668,9 @@ Page({
     var that = this
     if (sound) {
       if (isAudioPlaying) {
-        setTimeout(function () {
-          that.playSound(sound)
-        }, 500)
+        this.setData({ soundTimer: setTimeout(function () { that.playSound(sound) }, 1000) }) 
       }
       else {
-        console.log("play " + sound)
         isAudioPlaying = true
         innerAudioContext.src = sound
         innerAudioContext.onEnded(function () { isAudioPlaying = false })

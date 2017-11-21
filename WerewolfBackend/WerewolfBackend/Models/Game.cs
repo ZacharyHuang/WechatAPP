@@ -3,6 +3,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using WerewolfBackend.Utils;
 
@@ -128,9 +129,10 @@ namespace WerewolfBackend.Models
                 }
                 characters.RemoveAt(rand);
             }
+            GameDB.SetGame(RoomId, this);
         }
 
-        public void NextStage()
+        void _nextStage()
         {
             if (Status.Stage == GameStage.DayTime || Status.Stage == GameStage.Prepare)
             {
@@ -146,6 +148,10 @@ namespace WerewolfBackend.Models
                     GameStage.WerewolfNight;
             }
             else if (Status.Stage == GameStage.CupidNight)
+            {
+                Status.Stage = GameStage.LoversDayTime;
+            }
+            else if (Status.Stage == GameStage.LoversDayTime)
             {
                 Status.Stage = GameStage.LoversNight;
             }
@@ -232,26 +238,67 @@ namespace WerewolfBackend.Models
                 }
                 ++Status.Date;
             }
+            GameDB.SetGame(RoomId, this);
         }
+
+        public void NextStage()
+        {
+            _nextStage();
+            if (Status.Stage == GameStage.ThiefNight && !Status.CanThiefChoose)
+            {
+                Task.Delay(6000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+            if (Status.Stage == GameStage.CupidNight && !Status.CanCupidMakeCouple)
+            {
+                Task.Delay(7000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+            if (Status.Stage == GameStage.WitchNight && !Status.CanWitchHeal && ! Status.CanWitchPoison)
+            {
+                Task.Delay(5000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+            if (Status.Stage == GameStage.ProphetNight && !Status.CanProphetCheck)
+            {
+                Task.Delay(5000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+            if (Status.Stage == GameStage.GuardNight && !Status.CanGuardGuard)
+            {
+                Task.Delay(6000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+            if (Status.Stage == GameStage.DemonNight && !Status.CanDemonCheck)
+            {
+                Task.Delay(5000 + RandomUtil.GenRandomInt(4) * 1000).Wait();
+                _nextStage();
+            }
+        }
+
         public void WerewolfKill(int seatNumber)
         {
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WerewolfKill = seatNumber;
+            GameDB.SetGame(RoomId, this);
         }
         public void WitchHeal()
         {
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WitchHeal = true;
+            GameDB.SetGame(RoomId, this);
         }
         public void WitchPoison(int seatNumber)
         {
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].WitchPoison = seatNumber;
+            GameDB.SetGame(RoomId, this);
         }
         public Camp ProphetCheck(int seatNumber)
         {
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].ProphetCheck = seatNumber;
+            GameDB.SetGame(RoomId, this);
             return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }
         public bool GuardGuard(int seatNumber)
@@ -259,12 +306,14 @@ namespace WerewolfBackend.Models
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             if (Status.Date > 0 && seatNumber == Status.Trace[Status.Date - 1].GuardGuard) return false;
             Status.Trace[Status.Date].GuardGuard = seatNumber;
+            GameDB.SetGame(RoomId, this);
             return true;
         }
         public Camp DemonCheck(int seatNumber)
         {
             if (Status.Trace.Count <= Status.Date) Status.Trace.Add(new GameTrace());
             Status.Trace[Status.Date].DemonCheck = seatNumber;
+            GameDB.SetGame(RoomId, this);
             return CharacterUtil.CheckCamp(Characters[seatNumber]);
         }
 
@@ -293,12 +342,14 @@ namespace WerewolfBackend.Models
                     Status.CanDemonCheck = true;
                     break;
             }
+            GameDB.SetGame(RoomId, this);
         }
 
         public void CupidMakeCouple(int lover1, int lover2)
         {
             Lovers[0] = lover1;
             Lovers[1] = lover2;
+            GameDB.SetGame(RoomId, this);
         }
     }
     public class GameConfig
@@ -339,6 +390,7 @@ namespace WerewolfBackend.Models
 
 
         public int Date { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public GameStage Stage { get; set; }
         public List<GameTrace> Trace { get; set; }
         public GameStatus()
@@ -356,5 +408,11 @@ namespace WerewolfBackend.Models
         public int DemonCheck;
 
         public List<int> Dead;
+    }
+    public class CharacterInfo
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Character Character;
+        public bool? IsLover;
     }
 }

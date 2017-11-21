@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using WerewolfBackend.Models;
@@ -46,6 +47,11 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Player number is not enough");
             }
 
+            if (playerNumber > 20)
+            {
+                return BadRequest("Too many player");
+            }
+
             GameConfig config = new GameConfig
             {
                 VillageNumber = villageNumber,
@@ -71,8 +77,7 @@ namespace WerewolfBackend.Controllers
             game.RoomId = roomId;
             game.Config = config;
             game.InitGame();
-
-            GameDB.SetGame(roomId, game);
+            
             return Ok(roomId);
         }
 
@@ -85,7 +90,7 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Game not exist");
             }
 
-            for (int i = 0; i < 20; ++i)
+            for (int i = 0; i <= 20; ++i)
             {
                 RoomDB.RemovePlayer(roomId, i);
             }
@@ -120,7 +125,23 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Seat number is illegal");
             }
 
-            return Ok(game.Characters[seatNumber].ToString());
+            CharacterInfo info = new CharacterInfo() { Character = game.Characters[seatNumber], IsLover = null };
+            if (game.Config.CupidNumber > 0 && game.Lovers != null)
+            {
+                if (game.Status.Stage == GameStage.Prepare || game.Status.Stage == GameStage.ThiefNight)
+                {
+                    info.IsLover = null;
+                }
+                else if (game.Lovers[0] == seatNumber || game.Lovers[1] == seatNumber)
+                {
+                    info.IsLover = true;
+                }
+                else
+                {
+                    info.IsLover = false;
+                }
+            }
+            return Ok(JsonConvert.SerializeObject(info));
         }
 
         [HttpGet]
@@ -131,6 +152,7 @@ namespace WerewolfBackend.Controllers
             {
                 return BadRequest("Game not exist");
             }
+
             return Ok(game.Status.Stage.ToString());
         }
 
@@ -143,7 +165,7 @@ namespace WerewolfBackend.Controllers
                 return BadRequest("Game not exist");
             }
 
-            if (game.Status.Stage != GameStage.Prepare && game.Status.Stage != GameStage.DayTime)
+            if (game.Status.Stage != GameStage.Prepare && game.Status.Stage != GameStage.DayTime && game.Status.Stage != GameStage.LoversDayTime)
             {
                 return BadRequest("Not now");
             }
@@ -288,8 +310,7 @@ namespace WerewolfBackend.Controllers
             }
 
             if (useSkill) game.ThiefChoose(choice);
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok();
         }
@@ -328,8 +349,7 @@ namespace WerewolfBackend.Controllers
             }
 
             if (useSkill) game.CupidMakeCouple(target1, target2);
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok();
         }
@@ -364,8 +384,7 @@ namespace WerewolfBackend.Controllers
             }
 
             if (useSkill) game.WerewolfKill(target);
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok();
         }
@@ -426,8 +445,7 @@ namespace WerewolfBackend.Controllers
 
             if (heal) game.WitchHeal();
             if (poison) game.WitchPoison(target);
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok();
         }
@@ -462,8 +480,7 @@ namespace WerewolfBackend.Controllers
             }
 
             var result = useSkill ? (game.ProphetCheck(target) == Camp.Werewolf ? "Werewolf" : "Non-werewolf") : "";
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok(result);
         }
@@ -503,8 +520,7 @@ namespace WerewolfBackend.Controllers
             }
 
             game.GuardGuard(target);
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok();
         }
@@ -539,8 +555,7 @@ namespace WerewolfBackend.Controllers
             }
 
             var result = useSkill ? (game.DemonCheck(target) == Camp.God ? "God" : "Non-god") : "";
-            game.NextStage();
-            GameDB.SetGame(roomId, game);
+            Task.Factory.StartNew(() => game.NextStage());
 
             return Ok(result);
         }
