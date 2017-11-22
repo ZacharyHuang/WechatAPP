@@ -7,7 +7,7 @@
     <view style="margin:0 10px">狼：{{allWerewolfNumber}}</view>
   </view>
 </view>
-<view class="column center scroll-section" scroll-y="true" scroll-x="false">
+<view class="column center scroll-section" scroll-y="true">
   <view class="row block">
     <view class="center" style="width:20%">神</view>
     <view style="width:80%">
@@ -33,7 +33,7 @@
       </view>
     </view>
   </view>
-  <view class="row werewolfBlock">
+  <view class="row block">
     <view class="center" style="width:20%">狼</view>
     <view style="width:80%">
       <view class="row center">

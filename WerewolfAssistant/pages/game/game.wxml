@@ -1,7 +1,7 @@
 <!--pages/game/game.wxml-->
 <view class="at-top center" style="width:100%;background-color:white;">房间号：{{roomId}}</view>
 
-<view class="column center scroll-section" scroll-y="true" scroll-x="false">
+<scroll-view class="column center scroll-section" scroll-y="true" scroll-x="false">
   <view class="column center" wx:if="{{config.PlayerNumber<=9}}">
     <view class="row center" style="width:96vw">
       <view wx:for="{{[1,2,3]}}" class= "seat-lg column center" data-seatNumber="{{item}}" bindtap="tapSeat">
@@ -55,7 +55,7 @@
     </view>
   </view>
   <view style="min-height:20vh;"></view>
-</view>
+</scroll-view>
 
 <view class="at-bottom" style="width:100%;">
   <view class="row" wx:if="{{isHost}}">

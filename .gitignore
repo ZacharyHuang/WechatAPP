@@ -3,8 +3,9 @@
 WerewolfBackend/WerewolfBackend/[Dd]ebug/
 WerewolfBackend/WerewolfBackend/[Rr]elease/
 WerewolfBackend/WerewolfBackend/[Bb]in/
-WerewolfBackend/WerewolfBackend/[Oo]bj/
+WerewolfBackend/WerewolfBackend/[Oo]bj
 WerewolfBackend/WerewolfBackend/[Ll]og/
+WerewolfBackend/WerewolfBackend/[Aa]pp_Data/
 
 # VS cache
 WerewolfBackend/.vs/

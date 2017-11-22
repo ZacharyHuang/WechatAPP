@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace WerewolfBackend.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         public ActionResult Index()
@@ -25,6 +26,26 @@ namespace WerewolfBackend.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        public ActionResult Home()
+        {
+            return PartialView();
+        }
+
+        public ActionResult Join()
+        {
+            return PartialView();
+        }
+
+        public ActionResult Create()
+        {
+            return PartialView();
+        }
+
+        public ActionResult Game()
+        {
+            return PartialView();
         }
     }
 }

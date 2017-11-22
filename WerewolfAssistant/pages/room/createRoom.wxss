@@ -2,11 +2,15 @@
 view {
   width: 100%;
 }
+scroll-view {
+  width: 100%;
+}
 .scroll-section {
   height: 100%;
   padding-top: 20%;
 }
 .block {
+  width: 100%;
   padding: 5px 0;
 }
 .characterView {
